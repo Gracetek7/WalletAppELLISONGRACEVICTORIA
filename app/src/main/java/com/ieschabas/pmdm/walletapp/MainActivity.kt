@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tarjetasRepository: TarjetasRepository
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var usuarioFragment: UsuarioFragment
-    //heheh
+    //hehehe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
