@@ -68,6 +68,7 @@ dependencies {
 
     //Inicio sesion Room DataBase
     implementation ("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
 
     //Login dependencia FireBase Authentication
