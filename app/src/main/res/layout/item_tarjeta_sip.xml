@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_tarjeta_sip.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+
+    <!-- Tarjeta con esquinas redondeadas y sombra -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:elevation="6dp"
+        android:background="@android:color/transparent"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:outlineProvider="bounds"
+        android:padding="10dp"
+        android:foregroundGravity="center">
+
+        <!-- Contenedor principal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:background="@drawable/background_rounded">
+
+            <!-- Información del usuario -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Apellidos y nombre -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/apellidos_nombre"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvApellidosNombreUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Número SIP -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/numero_sip"
+                        android:textStyle="bold"/>
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvNumeroSip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Dígito de Control -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/digito_control"
+                        android:textStyle="bold"/>
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvDigitoControl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Código de Identificación Territorial -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/codigo_identificacion_territorial"
+                        android:textStyle="bold"/>
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvCodigoIdentificacionTerritorial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Datos de Identificación -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/datos_identificacion"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvDatosIdentificacion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Código SNS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/codigo_sns"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvCodigoSns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Fecha de Emisión -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fecha_emision"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvFechaEmisionUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Fecha de Caducidad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fecha_caducidad"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvFechaCaducidadUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Teléfono de Urgencias -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/telefono_urgencias"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvTelefonoUrgencias"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Número de Seguridad Social -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/numero_seguridad_social"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvNumeroSeguridadSocial"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Centro Médico -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/centro_medico"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvCentroMedico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Médico Asignado -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/medico_asignado"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvMedicoAsignadoUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Enfermera Asignada -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enfermera_asignada"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvEnfermeraAsignadaUsuario"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Teléfonos de Urgencias y Cita Previa -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/telefonos_urgencias_cita_previa"
+                        android:textStyle="bold"/>
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvTelefonosUrgenciasCitaPrevia"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

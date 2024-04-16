@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_tarjeta_sip.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+
+    <!-- Tarjeta con esquinas redondeadas y sombra -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:elevation="6dp"
+        android:background="@android:color/transparent"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:outlineProvider="bounds"
+        android:padding="10dp"
+        android:foregroundGravity="center">
+
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

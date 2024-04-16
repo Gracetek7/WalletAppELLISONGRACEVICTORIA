@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "383094875516",
+    "project_id": "walletapp-59db8",
+    "storage_bucket": "walletapp-59db8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:383094875516:android:1a6d085ce12273713870f9",
+        "android_client_info": {
+          "package_name": "com.ieschabas.pmdm.walletapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcz3GKoXsFLHNjPUCucdCthhTa9_LLY90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

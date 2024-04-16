@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_usuario" >
+
+        <action
+            android:id="@+id/action_nav_home_usuario"
+            app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/action_nav_home_to_tarjeta_dni"
+            app:destination="@id/nav_tarjeta_dni" />
+        <action
+            android:id="@+id/action_nav_home_to_tarjeta_sip"
+            app:destination="@id/nav_tarjeta_sip" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_tarjeta_dni"
+        android:name="com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIFragment"
+        android:label="@string/menu_tarjeta_dni"
+        tools:layout="@layout/fragment_tarjeta_dni" >
+        <action
+            android:id="@+id/action_nav_tarjeta_dni_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_tarjeta_sip"
+        android:name="com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPFragment"
+        android:label="@string/menu_tarjeta_sip"
+        tools:layout="@layout/fragment_tarjeta_sip" >
+        <action
+            android:id="@+id/action_nav_tarjeta_sip_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
+</navigation>

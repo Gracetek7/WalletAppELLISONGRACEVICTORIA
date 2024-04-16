@@ -1,0 +1,67 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">WalletApp</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">WalletApp - Tu Billetera Digital</string>
+    <string name="nav_header_subtitle">walletapp@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_usuario">Usuario</string>
+
+    <string name="domicilio">DOMICILIO: </string>
+    <string name="lugar_de_nacimiento">LUGAR DE NACIMIENTO: </string>
+    <string name="validez">VALIDEZ: </string>
+    <string name="emision">EMISION: </string>
+    <string name="nacimiento">NACIMIENTO: </string>
+    <string name="nacionalidad">NACIONALIDAD: </string>
+    <string name="sexo">SEXO: </string>
+    <string name="apellidos">APELLIDOS:  </string>
+    <string name="nombre">NOMBRE: </string>
+    <string name="dni">DNI: </string>
+
+    <string name="fotografia">Fotografía</string>
+
+    <string name="nuevaCuenta">¿No tienes una cuenta? Regístrate</string>
+    <string name="iniciar_sesion">Iniciar Sesión</string>
+
+    <string name="contrasena">Contraseña</string>
+    <string name="correo">Correo Electrónico</string>
+    <string name="firma">FIRMA</string>
+
+    <string name="numero_sip">NUMERO: </string>
+    <string name="digito_control">DIGITO CONTROL: </string>
+    <string name="codigo_identificacion_territorial">COD. IDENTIFICACION TERRITORIAL: </string>
+    <string name="datos_identificacion">DATOS IDENTIFICACION: </string>
+    <string name="codigo_sns">CODIGO SNS: </string>
+    <string name="fecha_emision">FECHA EMISION: </string>
+    <string name="fecha_caducidad">FECHA CADUCIDAD: </string>
+    <string name="telefono_urgencias">TELEFONO URGENCIAS: </string>
+    <string name="numero_seguridad_social">NUMERO SEGURIDAD SOCIAL: </string>
+    <string name="centro_medico">CENTRO MEDICO: </string>
+    <string name="medico_asignado">MEDICO ASIGNADO: </string>
+    <string name="enfermera_asignada">ENFERMERA ASIGNADA:</string>
+    <string name="telefonos_urgencias_cita_previa">TELEF. URGENCIAS/CITA PREVIA: </string>
+    <string name="apellidos_nombre">APELLIDOS Y NOMBRE: </string>
+    <string name="fab_description">Descripcion\n</string>
+    <string name="agregar_tarjeta">Agregar Tarjeta</string>
+    <string name="fecha_expedicion">Fecha de Expedición (dd/mm/aaaa)</string>
+    <string name="fecha_nacimiento">Fecha de Nacimiento (dd/mm/aaaa)</string>
+    <string name="fecha_caducidad_2">Fecha de Caducidad (dd/mm/aaaa) </string>
+    <string name="numero_documento">Número de Documento</string>
+
+    <!-- Menu  -->
+    <string name="menu_tarjeta_dni">Tarjeta DNI</string>
+    <string name="menu_user">HOME</string>
+    <string name="menu_tarjeta_sip">Tarjeta SIP</string>
+
+    <string-array name="sexo_options">
+        <item>Masculino</item>
+        <item>Femenino</item>
+    </string-array>
+
+    />
+</resources>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageButton
+        android:id="@+id/btnSeleccionarFoto"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:onClick="seleccionarFoto"
+        android:src="@drawable/ic_photo" />
+
+
+    <EditText
+        android:id="@+id/editTextNumeroDocumento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/numero_documento"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/editTextFechaNacimiento"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/fecha_nacimiento"
+            android:inputType="date"
+            android:backgroundTint="@color/teal_700"
+            android:padding="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginEnd="4dp"/>
+
+        <EditText
+            android:id="@+id/editTextFechaExpedicion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/fecha_expedicion"
+            android:inputType="date"
+            android:backgroundTint="@color/teal_700"
+            android:padding="12dp"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/editTextFechaCaducidad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/fecha_caducidad_2"
+        android:inputType="date"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextApellidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Apellidos"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerSexo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:entries="@array/sexo_options"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextNacionalidad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nacionalidad"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextLugarNacimiento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Lugar de Nacimiento"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextDomicilio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Domicilio"
+        android:inputType="text"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <ImageButton
+        android:id="@+id/btnFirma"
+        android:layout_width="380dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_signature"
+        android:onClick="capturarFirma" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonCancelar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancelar"
+            android:textColor="@android:color/white"
+            android:background="@color/colorAccent"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/buttonCrear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Crear"
+            android:textColor="@android:color/white"
+            android:background="@color/colorAccent"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+</LinearLayout>

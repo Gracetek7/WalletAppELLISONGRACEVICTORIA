@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_tarjeta_dni.xml -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp">
+
+    <!-- Tarjeta con esquinas redondeadas y sombra -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="4dp"
+        android:elevation="6dp"
+        android:background="@android:color/transparent"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:outlineProvider="bounds"
+        android:padding="10dp"
+        android:foregroundGravity="center">
+
+        <!-- Contenedor principal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:background="@drawable/background_rounded_dni">
+
+            <!-- Firma del usuario -->
+            <ImageView
+                android:id="@+id/ivFotografia"
+                android:layout_width="154dp"
+                android:layout_height="100dp"
+                android:layout_gravity=""
+                android:layout_marginTop="8dp"
+                android:contentDescription="@string/fotografia"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <!-- Información del usuario -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <!-- Número de Documento -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dni"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvNumeroDocumento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Nombre -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nombre"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvNombre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Apellidos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/apellidos"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvApellidos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Sexo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sexo"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvSexo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Nacionalidad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nacionalidad"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvNacionalidad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Fecha de Nacimiento -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nacimiento"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvFechaNacimiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Fecha de Expedición -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/emision"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvFechaExpedicion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Fecha de Caducidad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/validez"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvFechaCaducidad"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Lugar de Nacimiento -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lugar_de_nacimiento"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvLugarNacimiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Domicilio -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <!-- Descripción estática -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/domicilio"
+                        android:textStyle="bold" />
+
+                    <!-- Valor dinámico del usuario -->
+                    <TextView
+                        android:id="@+id/tvDomicilio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Firma del usuario -->
+                <ImageView
+                    android:id="@+id/ivFirma"
+                    android:layout_width="278dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@string/firma"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
