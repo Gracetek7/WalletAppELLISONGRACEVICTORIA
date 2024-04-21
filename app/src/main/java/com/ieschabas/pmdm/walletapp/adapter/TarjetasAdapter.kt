@@ -3,14 +3,10 @@ package com.ieschabas.pmdm.walletapp.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaDniBinding
-import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaDniBinding
-import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaPermisoBinding
 import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNViewHolder
-import com.ieschabas.pmdm.walletapp.ui.tarjetaPermisoCirculacion.TarjetaPermisoCirculacionViewHolder
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewHolder
 
 class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -27,10 +23,10 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
                 val binding = ItemTarjetaSipBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                 TarjetaSIPViewHolder(binding)
             }
-            TIPO_TARJETA_PERMISO_CIRCULACION -> {
-                val binding = ItemTarjetaPermisoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                TarjetaPermisoCirculacionViewHolder(binding, listener)
-            }
+//            TIPO_TARJETA_PERMISO_CIRCULACION -> {
+//                val binding = ItemTarjetaPermisoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//                TarjetaPermisoCirculacionViewHolder(binding, listener)
+//            }
             else -> throw IllegalArgumentException("Tipo de tarjeta desconocido")
         }
     }
@@ -48,9 +44,9 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
                 val viewHolder = holder as TarjetaSIPViewHolder
                 viewHolder.bind(tarjeta as Tarjeta.TarjetaSIP)
             }
-            TIPO_TARJETA_PERMISO_CIRCULACION -> {
-                (holder as TarjetaPermisoCirculacionViewHolder).bind(tarjeta as Tarjeta.TarjetaPermisoCirculacion)
-            }
+//            TIPO_TARJETA_PERMISO_CIRCULACION -> {
+//                (holder as TarjetaPermisoCirculacionViewHolder).bind(tarjeta as Tarjeta.TarjetaPermisoCirculacion)
+//            }
         }
     }
 
@@ -78,6 +74,7 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
         notifyDataSetChanged()
     }
 }
+
 
 
 

@@ -60,7 +60,7 @@
     <string name="tarjetas">Mis Tarjetas</string>
     <string name="tarjeta_dni">DNI</string>
     <string name="tarjeta_sip">SIP</string>
-    <string name="tarjeta_permiso_circulacion">Tarjeta Permiso Circulacion</string>
+    <string name="tarjeta_permiso_circulacion">Permiso Circulacion</string>
 
     <!-- Campos asociados a la tarjeta DNI del usuario -->
     <string name="dni_template">%2$s</string>
