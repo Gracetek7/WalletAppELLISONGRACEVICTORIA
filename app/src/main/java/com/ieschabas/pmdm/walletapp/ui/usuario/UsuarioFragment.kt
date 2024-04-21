@@ -3,134 +3,102 @@ package com.ieschabas.pmdm.walletapp.ui.usuario
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.ieschabas.pmdm.walletapp.R
 import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ComponentActivity
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
+import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
-import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIFragment
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNViewHolder
-import kotlinx.coroutines.launch
+
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetaDNViewHolder.OnTarjetaClickListener {
+    constructor() : this(TarjetasRepository(TarjetasApi()))
 
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
 
-    constructor() : this(TarjetasRepository(TarjetasApi()))
+    private var _binding: FragmentUsuarioBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflar el diseño del fragmento
-        val view = inflater.inflate(R.layout.fragment_usuario, container, false)
-
-        // Configurar la barra de herramientas (Toolbar)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-        // Configurar el botón de hamburguesa en la barra de herramientas
-        (activity as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_menu_usuario) // Establecer el icono de hamburguesa
-        }
-
-        return view
+    ): View {
+        _binding = FragmentUsuarioBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("UsuarioFragment", "Hilo actual: ${Thread.currentThread().name}")
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
-        val crearTarjetaButton = view.findViewById<Button>(R.id.btnAgregarTarjeta)
+        val recyclerView = binding.recyclerView
+        val crearTarjetaButton = binding.btnAgregarTarjeta
 
-        // Asignar el LayoutManager antes de crear el adaptador y asignarlo al RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // Inicializar el adaptador de tarjetas
+        tarjetasAdapter = TarjetasAdapter(this)
+        recyclerView.adapter = tarjetasAdapter  // Configurar el adaptador en el RecyclerView
 
         val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
         viewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
 
-        // Initialize the adapter with an empty list
-        tarjetasAdapter = TarjetasAdapter(this)
-        recyclerView.adapter = tarjetasAdapter
-
-        // Observe the tarjetasUsuario LiveData in the ViewModel
+        // Observar las tarjetas del usuario después de cargarlas
         viewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
-            // Agregar un mensaje de depuración para verificar si las tarjetas se están recibiendo correctamente
-            Log.d("UsuarioFragment", "Tarjetas recibidas: $tarjetas")
+            tarjetas?.let {
 
-            // Verificar si las tarjetas DNI están presentes en la lista
-            val tarjetasDNI = tarjetas.filterIsInstance<Tarjeta.TarjetaDNI>()
-            Log.d("UsuarioFragment", "Tarjetas DNI recibidas: $tarjetasDNI")
+                for (tarjeta in tarjetas) {
+                    Log.d("UsuarioFragment", "Tarjeta: $tarjeta")
+                }
 
-            // Update the adapter with the new data
-            tarjetasAdapter.updateData(tarjetas)
+                // Actualizar el adaptador con las nuevas tarjetas
+                tarjetasAdapter.updateData(tarjetas.toMutableList())
 
-            // Agregar un mensaje de depuración para verificar el número de tarjetas recibidas
-            Log.d("UsuarioFragment", "Número de tarjetas: ${tarjetas.size}")
+                // Agregar un mensaje de depuración para verificar el número de tarjetas recibidas
+                Log.d("UsuarioFragment", "Número de tarjetas: ${tarjetas.size}")
+
+                // Mostrar el formulario para crear nuevas tarjetas
+                //viewModel.mostrarFormularioCrearTarjetas(tarjetas.firstOrNull() ?: Usuario())
+            }
         }
 
-        // Observar errores y mostrar mensajes de toast
+        // Observar los errores
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
 
-        // Configurar el botón para mostrar el formulario de creación de tarjetas
-        crearTarjetaButton.setOnClickListener {
-            viewModel.usuarioActual.value?.let { usuario ->
-                viewModel.mostrarFormularioCrearTarjetas(usuario)
-            }
-        }
-        // Carga al usuario con sus tarjetas
-        cargarUsuarioActual()
+        cargarUsuarioActual() // Llamar al método para cargar el usuario actual y sus tarjetas asociadas
     }
 
-    // Al hacer un click se llama al metodo
     override fun onTarjetaClick(tarjeta: Tarjeta.TarjetaDNI) {
-        // For example, expand the card or show a detailed view
-
-        //Expandir la tarjeta al hacer click a pantalla completa
+        // Aquí colocas la lógica que deseas realizar cuando se hace clic en una tarjeta DNI
+        // Por ejemplo, podrías abrir una nueva pantalla o mostrar información adicional sobre la tarjeta.
     }
 
-    // Al hacer un click largo se llama al metodo
     override fun onTarjetaLongClick(tarjeta: Tarjeta.TarjetaDNI, position: Int) {
-        // For example, show a delete confirmation dialog
+        TODO("Not yet implemented")
+    }
 
-        //Complementar con algo
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun cargarUsuarioActual() {
-        // Recoge el ID autogenerado por Firebase del usuario
-        val usuario = FirebaseAuth.getInstance().currentUser
-        val usuarioId = usuario?.uid
-        usuarioId?.let {
-            Log.d("UsuarioFragment", "ID de usuario: $it")
-            viewModel.viewModelScope.launch {
-                // Carga al usuario actual con sus tarjetas
-                viewModel.cargarUsuarioActual(it)
-                Log.d("UsuarioFragment", "Cargando las tarjetas del usuario: $it")
+        val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
+        usuarioId?.let { id ->
+            viewModel.cargarTarjetasUsuario(id)
+            viewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
+                tarjetas?.let {
+                    tarjetasAdapter.updateData(tarjetas.toMutableList())
+                }
             }
         }
     }

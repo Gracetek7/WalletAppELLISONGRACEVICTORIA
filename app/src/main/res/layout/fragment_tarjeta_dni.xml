@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- item_tarjeta_dni.xml -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp">
 
-    <!-- Tarjeta con esquinas redondeadas y sombra -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+
+        <TextView
+            android:id="@+id/tarjetasTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/tarjeta_dni"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+
+        <!-- Tarjeta con esquinas redondeadas y sombra -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -279,4 +295,6 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-</FrameLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

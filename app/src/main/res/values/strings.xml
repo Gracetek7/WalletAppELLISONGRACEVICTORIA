@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="app_name">WalletApp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -57,11 +57,44 @@
     <string name="menu_tarjeta_dni">Tarjeta DNI</string>
     <string name="menu_user">HOME</string>
     <string name="menu_tarjeta_sip">Tarjeta SIP</string>
+    <string name="tarjetas">Mis Tarjetas</string>
+    <string name="tarjeta_dni">DNI</string>
+    <string name="tarjeta_sip">SIP</string>
+    <string name="tarjeta_permiso_circulacion">Tarjeta Permiso Circulacion</string>
+
+    <!-- Campos asociados a la tarjeta DNI del usuario -->
+    <string name="dni_template">%2$s</string>
+    <string name="nombre_template">%2$s</string>
+    <string name="apellidos_template">%2$s</string>
+    <string name="sexo_template">%2$s</string>
+    <string name="nacionalidad_template">%2$s</string>
+    <string name="nacimiento_template">%2$s</string>
+    <string name="emision_template">%2$s</string>
+    <string name="validez_template">%2$s</string>
+    <string name="lugar_nacimiento_template">%2$s</string>
+    <string name="domicilio_template">%2$s</string>
+
+    <!-- Campos asociados a la tarjeta SIP del usuario -->
+    <string name="sip_template">%1$s</string>
+    <string name="numero_sip_template">%1$s</string>
+    <string name="digito_template">%1$s</string>
+    <string name="codigo_identificacion_territorial_template">%1$s</string>
+    <string name="datos_identificacion_template">%1$s</string>
+    <string name="codigo_sns_template">%1$s</string>
+    <string name="fecha_emision_template">%1$s</string>
+    <string name="fecha_caducidad_template">%1$s</string>
+    <string name="telefono_urgencias_template">%1$s</string>
+    <string name="numero_seguridad_social_template">%1$s</string>
+    <string name="centro_medico_template">%1$s</string>
+    <string name="medico_asignado_template">%1$s</string>
+    <string name="enfermera_asignada_template">%1$s</string>
+    <string name="telefono_urgencias_cita_previa_template">%1$s</string>
+    <string name="apellidos_nombre_template">%1$s</string>
+
 
     <string-array name="sexo_options">
         <item>Masculino</item>
         <item>Femenino</item>
     </string-array>
-
     />
 </resources>

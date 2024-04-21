@@ -57,6 +57,10 @@ dependencies {
     // Picasso
     implementation ("com.squareup.picasso:picasso:2.71828")
 
+    // Glide img
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
     // Retrofit para hacer peticiones HTTP
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
 

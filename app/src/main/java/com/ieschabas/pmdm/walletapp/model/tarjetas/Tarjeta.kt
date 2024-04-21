@@ -1,6 +1,5 @@
 package com.ieschabas.pmdm.walletapp.model.tarjetas
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
@@ -81,38 +80,38 @@ sealed class Tarjeta {
     data class TarjetaPermisoCirculacion(
         @PrimaryKey(autoGenerate = true)
         val id: Int = 0,
-        @ColumnInfo(name = "id_usuario")
+        @SerializedName("id_usuario")
         val idUsuario: String,
-        @ColumnInfo(name = "fecha_matriculacion")
+        @SerializedName("fecha_matriculacion")
         val fechaMatriculacion: Date,
-        @ColumnInfo(name = "apellido_razon_social")
+        @SerializedName("apellido_razon_social")
         val apellidoRazonSocial: String,
         val nombre: String,
         val domicilio: String,
-        @ColumnInfo(name = "marca_vehiculo")
+        @SerializedName("marca_vehiculo")
         val marcaVehiculo: String,
-        @ColumnInfo(name = "tipo_variante_version")
+        @SerializedName("tipo_variante_version")
         val tipoVarianteVersion: String,
-        @ColumnInfo(name = "denominacion_comercial")
+        @SerializedName("denominacion_comercial")
         val denominacionComercial: String,
-        @ColumnInfo(name = "servicio_destinado")
+        @SerializedName("servicio_destinado")
         val servicioDestinado: String,
-        @ColumnInfo(name = "numero_identificacion")
+        @SerializedName("numero_identificacion")
         val numeroIdentificacion: String,
-        @ColumnInfo(name = "masa_maxima")
+        @SerializedName("masa_maxima")
         val masaMaxima: Int,
-        @ColumnInfo(name = "numero_homologacion")
+        @SerializedName("numero_homologacion")
         val numeroHomologacion: String,
         val cilindrada: Int,
-        @ColumnInfo(name = "potencia_neta_maxima")
+        @SerializedName("potencia_neta_maxima")
         val potenciaNetaMaxima: Int,
-        @ColumnInfo(name = "tipo_combustible")
+        @SerializedName("tipo_combustible")
         val tipoCombustible: String,
-        @ColumnInfo(name = "num_plazas_asiento")
+        @SerializedName("num_plazas_asiento")
         val numPlazasAsiento: Int,
-        @ColumnInfo(name = "num_plazas_pie")
+        @SerializedName("num_plazas_pie")
         val numPlazasPie: Int,
-        @ColumnInfo(name = "relacion_potencia_peso")
+        @SerializedName("relacion_potencia_peso")
         val relacionPotenciaPeso: Float? = null
     ): Tarjeta()
 

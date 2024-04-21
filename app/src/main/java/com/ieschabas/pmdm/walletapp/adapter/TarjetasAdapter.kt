@@ -3,39 +3,34 @@ package com.ieschabas.pmdm.walletapp.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ieschabas.pmdm.walletapp.R
+import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaDniBinding
+import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaSipBinding
+import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaDniBinding
+import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaPermisoBinding
+import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNViewHolder
 import com.ieschabas.pmdm.walletapp.ui.tarjetaPermisoCirculacion.TarjetaPermisoCirculacionViewHolder
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewHolder
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val tarjetas = mutableListOf<Tarjeta>()
+    var tarjetas = mutableListOf<Tarjeta>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             TIPO_TARJETA_DNI -> {
-                val itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_tarjeta_dni, parent, false)
-                TarjetaDNViewHolder(itemView, listener)
+                val binding = ItemTarjetaDniBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                TarjetaDNViewHolder(binding, listener)
             }
-
             TIPO_TARJETA_SIP -> {
-                val itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_tarjeta_sip, parent, false)
-                TarjetaSIPViewHolder(itemView)
+                val binding = ItemTarjetaSipBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                TarjetaSIPViewHolder(binding)
             }
-
             TIPO_TARJETA_PERMISO_CIRCULACION -> {
-                val itemView = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_tarjeta_permiso, parent, false)
-                TarjetaPermisoCirculacionViewHolder(itemView)
+                val binding = ItemTarjetaPermisoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                TarjetaPermisoCirculacionViewHolder(binding, listener)
             }
-
             else -> throw IllegalArgumentException("Tipo de tarjeta desconocido")
         }
     }
@@ -43,14 +38,16 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val tarjeta = tarjetas[position]
         when (holder.itemViewType) {
+
             TIPO_TARJETA_DNI -> {
-                (holder as TarjetaDNViewHolder).bind(tarjeta as Tarjeta.TarjetaDNI)
+                val viewHolder = holder as TarjetaDNViewHolder
+                viewHolder.bind(tarjeta as Tarjeta.TarjetaDNI)
             }
 
             TIPO_TARJETA_SIP -> {
-                (holder as TarjetaSIPViewHolder).bind(tarjeta as Tarjeta.TarjetaSIP)
+                val viewHolder = holder as TarjetaSIPViewHolder
+                viewHolder.bind(tarjeta as Tarjeta.TarjetaSIP)
             }
-
             TIPO_TARJETA_PERMISO_CIRCULACION -> {
                 (holder as TarjetaPermisoCirculacionViewHolder).bind(tarjeta as Tarjeta.TarjetaPermisoCirculacion)
             }
@@ -64,6 +61,8 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
             is Tarjeta.TarjetaDNI -> TIPO_TARJETA_DNI
             is Tarjeta.TarjetaSIP -> TIPO_TARJETA_SIP
             is Tarjeta.TarjetaPermisoCirculacion -> TIPO_TARJETA_PERMISO_CIRCULACION
+
+
         }
     }
 
@@ -78,22 +77,8 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
         tarjetas.addAll(newData)
         notifyDataSetChanged()
     }
-
-
-
-//    private fun parseDate(dateString: Date): Date? {
-//        return SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault()).parse(dateString.toString())
-//    }
-//
-//
-//    private fun formatDate(date: Date?): String {
-//        if (date == null) {
-//            return ""
-//        }
-//
-//        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
-//    }
 }
+
 
 
 

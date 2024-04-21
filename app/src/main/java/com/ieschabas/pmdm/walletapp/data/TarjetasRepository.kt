@@ -101,6 +101,27 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
+    suspend fun obtenerTarjetaDNIUsuario(idUsuario: String): List<Tarjeta.TarjetaDNI> {
+        Log.d("TarjetasRepository", "ID de usuario recibido: $idUsuario")
+        val tarjetas: MutableList<Tarjeta.TarjetaDNI> = mutableListOf()
+        try {
+            // Obtener tarjeta SIP
+            val responseSIP = tarjetaService.getTarjetaDNIUsuario(idUsuario)
+            if (responseSIP.isSuccessful) {
+                val tarjetaDNI = responseSIP.body()
+                tarjetaDNI?.let { dni ->
+                    tarjetas.add(dni)
+                } ?: Log.e(errorApi, "La respuesta del servidor para la tarjeta DNI es nula")
+            } else if (responseSIP.code() != 404) {
+                Log.e(errorApi, "Error al obtener la tarjeta DNI del usuario: ${responseSIP.message()}")
+            }
+
+        } catch (e: Exception) {
+            Log.e(errorApi, "Error al obtener las tarjetas DNI del usuario: ${e.message}")
+        }
+        return tarjetas
+    }
+
     suspend fun getTarjetaDNI(id: Int): Response<Tarjeta.TarjetaDNI>? {
         try {
             return tarjetaService.getTarjetaDNI(id)
@@ -136,6 +157,28 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         }
         return null
     }
+
+    suspend fun obtenerTarjetaSIPUsuario(idUsuario: String): List<Tarjeta.TarjetaSIP> {
+        Log.d("TarjetasRepository", "ID de usuario recibido: $idUsuario")
+        val tarjetas: MutableList<Tarjeta.TarjetaSIP> = mutableListOf()
+        try {
+            // Obtener tarjeta SIP
+            val responseSIP = tarjetaService.getTarjetaSIPUsuario(idUsuario)
+            if (responseSIP.isSuccessful) {
+                val tarjetaSIP = responseSIP.body()
+                tarjetaSIP?.let { sip ->
+                    tarjetas.add(sip)
+                } ?: Log.e(errorApi, "La respuesta del servidor para la tarjeta SIP es nula")
+            } else if (responseSIP.code() != 404) {
+                Log.e(errorApi, "Error al obtener la tarjeta SIP del usuario: ${responseSIP.message()}")
+            }
+
+        } catch (e: Exception) {
+            Log.e(errorApi, "Error al obtener las tarjetas SIP del usuario: ${e.message}")
+        }
+        return tarjetas
+    }
+
 
     suspend fun getTarjetaSIP(id: Int): Response<Tarjeta.TarjetaSIP>? {
         try {

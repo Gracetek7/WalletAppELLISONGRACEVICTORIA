@@ -20,14 +20,12 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
     val usuarioActual: MutableLiveData<Usuario?> get() = _usuarioActual
 
     private val _tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
-    val tarjetasUsuario: LiveData<List<Tarjeta>> get() = _tarjetasUsuario
-
 
     private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> get() = _isLoading
-
     private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
+
+    val tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
+    val error = MutableLiveData<String>()
 
     suspend fun cargarUsuarioActual(idUsuario: String) {
         _isLoading.value = true
@@ -40,8 +38,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                     if (usuario != null) {
                         _usuarioActual.postValue(usuario)
                         Log.d("UsuarioViewModel", "Usuario cargado: $usuario")
-                        cargarTarjetasUsuario(idUsuario)
-                        //mostrarFormularioCrearTarjetas(usuario)
+                        cargarTarjetasUsuario(idUsuario) // Cargar también las tarjetas del usuario
                         return // Asegura que no se ejecute más código después de cargar las tarjetas
                     } else {
                         _error.postValue("Usuario no encontrado")
@@ -70,7 +67,6 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             }
         }
     }
-
 
     fun mostrarFormularioCrearTarjetas(usuario: Usuario) {
         val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación")

@@ -2,91 +2,91 @@ package com.ieschabas.pmdm.walletapp
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
-import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIFragment
-import com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioFragment
+import com.ieschabas.pmdm.walletapp.databinding.ActivityMainBinding
 import com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioViewModel
 import com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioViewModelFactory
-
+import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
     private lateinit var tarjetasRepository: TarjetasRepository
     private lateinit var viewModel: UsuarioViewModel
-    private lateinit var usuarioFragment: UsuarioFragment
-    //hehehe
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setSupportActionBar(binding.appBarMain.toolbar)
+
+        val drawerLayout: DrawerLayout = binding.drawerLayout
+        val navView: NavigationView = binding.navView
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_usuario, R.id.nav_tarjeta_dni, R.id.nav_tarjeta_sip
+            ), drawerLayout
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+
+        // Inicializar tarjetasRepository
         tarjetasRepository = TarjetasRepository(TarjetasApi())
 
-        setContentView(R.layout.activity_main)
+        val usuarioId = obtenerIdUsuario()
 
-        usuarioFragment = UsuarioFragment(tarjetasRepository)
-
-        val viewModelFactory = UsuarioViewModelFactory(applicationContext, tarjetasRepository)
-        viewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
-
-        // Observar cuando se complete la carga del usuario actual y sus tarjetas
-        viewModel.usuarioActual.observe(this) { usuario ->
-            usuario?.let {
-                Log.d("MainActivity", "Usuario cargado: $it")
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, usuarioFragment)
-                    .commit()
+        usuarioId?.let { id ->
+            // Use the custom ViewModelProvider.Factory to create an instance of UsuarioViewModel
+            val viewModelFactory = UsuarioViewModelFactory(this, tarjetasRepository)
+            viewModel =
+                ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
+            lifecycleScope.launch {
+                viewModel.cargarUsuarioActual(id)
             }
+
+            // Observar cuando se complete la carga del usuario actual y sus tarjetas
+            viewModel.usuarioActual.observe(this) { usuario ->
+                usuario?.let {
+                    Log.d("MainActivity", "Usuario cargado: $it")
+
+                    // Si se cargó correctamente el usuario, navegamos al destino UsuarioFragment
+                    val navController = findNavController(R.id.nav_host_fragment_content_main)
+                    // Aquí navegamos directamente al UsuarioFragment
+                    navController.navigate(R.id.nav_usuario)
+                }
+            }
+
+        } ?: run {
+            mostrarError("No se pudo obtener el ID del usuario")
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_main_drawer, menu)
-        return true
+    private fun obtenerIdUsuario(): String? {
+        // Devuelve el ID de usuario del Firebase Authentication, o null si no se ha iniciado sesión
+        return FirebaseAuth.getInstance().currentUser?.uid
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                // Abrir el drawer cuando se hace clic en el botón de inicio
-                val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-                drawerLayout.openDrawer(GravityCompat.START)
-                true
-            }
-
-            R.id.nav_usuario -> {
-                // Navega a la pantalla de Usuario
-                Log.d("MainActivity", "Click en Home")
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, usuarioFragment)
-                    .commit()
-                true
-            }
-
-            R.id.nav_tarjeta_dni -> {
-                // Navega a la pantalla de Tarjeta DNI
-                Log.d("MainActivity", "Click en Tarjeta DNI")
-                val tarjetaDNIFragment = TarjetaDNIFragment()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, tarjetaDNIFragment)
-                    .commit()
-                true
-            }
-
-            R.id.nav_tarjeta_sip -> {
-                Log.d("MainActivity", "Click en Tarjeta SIP")
-                // Navega a la pantalla de Tarjeta SIP
-                val tarjetaSIPFragment = TarjetaDNIFragment()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, tarjetaSIPFragment)
-                    .commit()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
-        }
+    private fun mostrarError(mensaje: String) {
+        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

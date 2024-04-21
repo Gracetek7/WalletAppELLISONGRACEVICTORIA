@@ -1,6 +1,7 @@
 package com.ieschabas.pmdm.walletapp.ui.tarjetaDNI
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,8 +14,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
 
     // LiveData para almacenar la lista de tarjetas DNI
     private val _tarjetasDNI = MutableLiveData<List<Tarjeta.TarjetaDNI?>>()
-    val tarjetasDNI: LiveData<List<Tarjeta.TarjetaDNI?>>
-        get() = _tarjetasDNI
+    val tarjetasDNI: MutableLiveData<List<Tarjeta.TarjetaDNI?>> get() = _tarjetasDNI
 
     // LiveData para manejar el estado de carga
     private val _isLoading = MutableLiveData<Boolean>()
@@ -28,15 +28,20 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
 
     private var currentId: Int? = null
 
-    fun setId(id: Int) {
-        currentId = id
-        cargarTarjetaDNI(id)
-    }
-
-    init {
-        // If the id is available at this point, call setId
-        if (currentId != null) {
-            cargarTarjetaDNI(currentId!!)
+    fun cargarTarjetaDNIUsuario(idUsuario: String) {
+        viewModelScope.launch {
+            try {
+                Log.d("TarjetaDNIViewModel", "Cargando tarjetas del usuario con ID: $idUsuario")
+                val tarjetas = tarjetasRepository.obtenerTarjetaDNIUsuario(idUsuario)
+                Log.d("TarjetaDNIViewModel", "Tarjetas DNI cargadas: $tarjetas")
+                _tarjetasDNI.postValue(tarjetas)
+            } catch (e: Exception) {
+                Log.e(
+                    "TarjetaDNIViewModel",
+                    "Error al cargar las tarjetas DNI del usuario: ${e.message}"
+                )
+                _error.postValue("Error al cargar las tarjetas DNI del usuario: ${e.message}")
+            }
         }
     }
 
@@ -63,7 +68,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
                 if (response?.isSuccessful == true) {
                     // Tarjeta modificada exitosamente
                 } else {
-                    // Manejar el error
+                    Log.e("TarjetaDNIViewModel", "error al modificar la tarjeta dni")
                 }
             } else {
                 // Manejar el caso en que no se encuentre la tarjeta
@@ -80,7 +85,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
                 if (response?.isSuccessful == true) {
                     // Tarjeta eliminada exitosamente
                 } else {
-                    // Manejar el error
+                    Log.e("TarjetaDNIViewModel", "error al eliminar la tarjeta dni")
                 }
             } else {
                 // Manejar el caso en que no se encuentre la tarjeta

@@ -1,16 +1,17 @@
 package com.ieschabas.pmdm.walletapp.ui.tarjetaSIP
 
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ieschabas.pmdm.walletapp.R
+import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class TarjetaSIPViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding) : RecyclerView.ViewHolder(binding.root) {
 
     private val tvApellidosNombre: TextView = itemView.findViewById(R.id.tvApellidosNombreUsuario)
     private val tvNumeroSip: TextView = itemView.findViewById(R.id.tvNumeroSip)
@@ -56,9 +57,10 @@ class TarjetaSIPViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 
     private fun parseDate(dateString: Date): Date? {
-        return SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.getDefault()).parse(dateString.toString())
+        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(
+            dateString.toString()
+        )
     }
-
 
     private fun formatDate(date: Date?): String {
         if (date == null) {

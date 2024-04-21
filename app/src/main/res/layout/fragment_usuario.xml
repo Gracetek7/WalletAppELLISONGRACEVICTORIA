@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
@@ -15,13 +16,14 @@
         android:background="#FFFFFF"
         android:orientation="vertical">
 
-        <!-- Agregar la Toolbar -->
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <TextView
+            android:id="@+id/tarjetasTextView"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="?attr/actionBarTheme" />
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/tarjetas"
+            android:textAlignment="center"
+            android:textSize="20sp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -34,18 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:text="@string/agregar_tarjeta" />
-
+            android:text="@string/agregar_tarjeta"/>
     </LinearLayout>
 
-    <!-- Menú lateral -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer" />
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

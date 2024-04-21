@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- item_tarjeta_dni.xml -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="8dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- Tarjeta con esquinas redondeadas y sombra -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="4dp"
-        android:elevation="6dp"
-        android:background="@android:color/transparent"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:outlineProvider="bounds"
-        android:padding="10dp"
-        android:foregroundGravity="center">
+        <!-- Tarjeta con esquinas redondeadas y sombra -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:elevation="6dp"
+            android:background="@android:color/transparent"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:outlineProvider="bounds"
+            android:padding="10dp"
+            android:foregroundGravity="center"
+            app:layout_constraintTop_toTopOf="parent">
 
         <!-- Contenedor principal -->
         <LinearLayout
@@ -281,4 +281,4 @@
 
     </androidx.cardview.widget.CardView>
 
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
