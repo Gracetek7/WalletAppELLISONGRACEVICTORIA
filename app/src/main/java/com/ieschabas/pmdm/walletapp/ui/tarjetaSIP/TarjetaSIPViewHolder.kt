@@ -4,6 +4,8 @@ import android.util.Log
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ieschabas.pmdm.walletapp.R
+import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
+import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaDniBinding
 import com.ieschabas.pmdm.walletapp.databinding.ItemTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import java.text.SimpleDateFormat
@@ -11,7 +13,7 @@ import java.util.Date
 import java.util.Locale
 
 
-class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding) : RecyclerView.ViewHolder(binding.root) {
+class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding,private val listener: TarjetasAdapter.OnTarjetaClickListener) : RecyclerView.ViewHolder(binding.root) {
 
     private val tvApellidosNombre: TextView = itemView.findViewById(R.id.tvApellidosNombreUsuario)
     private val tvNumeroSip: TextView = itemView.findViewById(R.id.tvNumeroSip)
@@ -27,7 +29,6 @@ class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding) : Recycle
     private val tvMedicoAsignado: TextView = itemView.findViewById(R.id.tvMedicoAsignadoUsuario)
     private val tvEnfermeraAsignada: TextView = itemView.findViewById(R.id.tvEnfermeraAsignadaUsuario)
     private val tvTelefonosUrgenciasCitaPrevia: TextView = itemView.findViewById(R.id.tvTelefonosUrgenciasCitaPrevia)
-
 
     fun bind(tarjetaSIP: Tarjeta.TarjetaSIP) {
         Log.d("TarjetaDNViewHolder", "Bind Tarjeta SIP: $tarjetaSIP")
@@ -45,21 +46,25 @@ class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding) : Recycle
         tvEnfermeraAsignada.text = tarjetaSIP.enfermeraAsignada
         tvTelefonosUrgenciasCitaPrevia.text = tarjetaSIP.telefonosUrgenciasCitaPrevia
 
-
         // Parsea las fechas
-        val fechaEmision = parseDate(tarjetaSIP.fechaEmision)
-        val fechaCaducidad = parseDate(tarjetaSIP.fechaCaducidad)
+        val fechaEmision = tarjetaSIP.fechaEmision
+        val fechaCaducidad = tarjetaSIP.fechaCaducidad
 
         // Formatea las fechas
         tvFechaEmision.text = formatDate(fechaEmision)
         tvFechaCaducidad.text = formatDate(fechaCaducidad)
 
-    }
+        // Configuración de clics
+        binding.root.setOnClickListener {
+            Log.d("TarjetaSIPiewHolder", "Clic en la tarjeta")
+            listener.onTarjetaClick(tarjetaSIP)
+        }
 
-    private fun parseDate(dateString: Date): Date? {
-        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(
-            dateString.toString()
-        )
+        binding.root.setOnLongClickListener {
+            Log.d("TarjetaSIPiewHolder", "Clic largo en la tarjeta")
+            listener.onTarjetaLongClick(tarjetaSIP, bindingAdapterPosition)
+            true // Indica que el evento ha sido manejado correctamente
+        }
     }
 
     private fun formatDate(date: Date?): String {

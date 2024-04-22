@@ -122,8 +122,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         )
     }
 
-
-
     private fun cargarTarjetaDNIUsuario(tarjetaDNI: Tarjeta.TarjetaDNI) {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let {
@@ -131,7 +129,7 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
             viewModel.viewModelScope.launch {
                 val tarjetasDNI = viewModel.cargarTarjetaDNIUsuario(it)
                 // Verifica si se obtuvo una tarjeta DNI válida
-                tarjetasDNI.let { tarjeta ->
+                tarjetasDNI.let {
                     _binding?.tvNumeroDocumento?.text = getString(
                         R.string.dni_template,
                         getString(R.string.dni),

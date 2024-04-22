@@ -90,6 +90,12 @@
     <string name="enfermera_asignada_template">%1$s</string>
     <string name="telefono_urgencias_cita_previa_template">%1$s</string>
     <string name="apellidos_nombre_template">%1$s</string>
+    <string name="apellidosHint">Apellidos</string>
+    <string name="nacionalidadHint">Nacionalidad</string>
+    <string name="lugar_de_nacimientoHint">Lugar de Nacimiento</string>
+    <string name="domicilioHint">Domicilio</string>
+    <string name="cancelar_crear_tarjeta_dni">Cancelar</string>
+    <string name="aceptar_crear_tarjeta_dni">Crear</string>
 
 
     <string-array name="sexo_options">

@@ -9,7 +9,7 @@ import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNViewHolder
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewHolder
 
-class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var tarjetas = mutableListOf<Tarjeta>()
 
@@ -17,36 +17,27 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
         return when (viewType) {
             TIPO_TARJETA_DNI -> {
                 val binding = ItemTarjetaDniBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                TarjetaDNViewHolder(binding, listener)
+                TarjetaDNViewHolder(binding, listener) // Pasar el listener para Tarjeta DNI
             }
             TIPO_TARJETA_SIP -> {
                 val binding = ItemTarjetaSipBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                TarjetaSIPViewHolder(binding)
+                TarjetaSIPViewHolder(binding, listener) // Pasar el listener para Tarjeta SIP
             }
-//            TIPO_TARJETA_PERMISO_CIRCULACION -> {
-//                val binding = ItemTarjetaPermisoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-//                TarjetaPermisoCirculacionViewHolder(binding, listener)
-//            }
-            else -> throw IllegalArgumentException("Tipo de tarjeta desconocido")
+            else -> throw IllegalArgumentException("Tipo de tarjeta no encontrada")
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val tarjeta = tarjetas[position]
+        val context = holder.itemView.context // Obtener el contexto del elemento de la vista
+
         when (holder.itemViewType) {
-
             TIPO_TARJETA_DNI -> {
-                val viewHolder = holder as TarjetaDNViewHolder
-                viewHolder.bind(tarjeta as Tarjeta.TarjetaDNI)
+                (holder as TarjetaDNViewHolder).bind(tarjeta as Tarjeta.TarjetaDNI, context)
             }
-
             TIPO_TARJETA_SIP -> {
-                val viewHolder = holder as TarjetaSIPViewHolder
-                viewHolder.bind(tarjeta as Tarjeta.TarjetaSIP)
+                (holder as TarjetaSIPViewHolder).bind(tarjeta as Tarjeta.TarjetaSIP)
             }
-//            TIPO_TARJETA_PERMISO_CIRCULACION -> {
-//                (holder as TarjetaPermisoCirculacionViewHolder).bind(tarjeta as Tarjeta.TarjetaPermisoCirculacion)
-//            }
         }
     }
 
@@ -56,16 +47,13 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
         return when (tarjetas[position]) {
             is Tarjeta.TarjetaDNI -> TIPO_TARJETA_DNI
             is Tarjeta.TarjetaSIP -> TIPO_TARJETA_SIP
-            is Tarjeta.TarjetaPermisoCirculacion -> TIPO_TARJETA_PERMISO_CIRCULACION
-
-
+            else -> throw IllegalArgumentException("Tipo de tarjeta no encontrada")
         }
     }
 
     companion object {
         private const val TIPO_TARJETA_DNI = 1
         private const val TIPO_TARJETA_SIP = 2
-        private const val TIPO_TARJETA_PERMISO_CIRCULACION = 3
     }
 
     fun updateData(newData: List<Tarjeta>) {
@@ -73,9 +61,10 @@ class TarjetasAdapter(private val listener: TarjetaDNViewHolder.OnTarjetaClickLi
         tarjetas.addAll(newData)
         notifyDataSetChanged()
     }
+
+    // Definir la interfaz del listener
+    interface OnTarjetaClickListener {
+        fun onTarjetaClick(tarjeta: Tarjeta)
+        fun onTarjetaLongClick(tarjeta: Tarjeta, position: Int)
+    }
 }
-
-
-
-
-

@@ -8,8 +8,9 @@
     <ImageButton
         android:id="@+id/btnSeleccionarFoto"
         android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:onClick="seleccionarFoto"
+        android:layout_gravity="center"
         android:src="@drawable/ic_photo" />
 
 
@@ -85,7 +86,7 @@
         android:id="@+id/editTextApellidos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Apellidos"
+        android:hint="@string/apellidosHint"
         android:inputType="text"
         android:backgroundTint="@color/teal_700"
         android:padding="12dp"
@@ -108,7 +109,7 @@
         android:id="@+id/editTextNacionalidad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nacionalidad"
+        android:hint="@string/nacionalidadHint"
         android:inputType="text"
         android:backgroundTint="@color/teal_700"
         android:padding="12dp"
@@ -120,7 +121,7 @@
         android:id="@+id/editTextLugarNacimiento"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Lugar de Nacimiento"
+        android:hint="@string/lugar_de_nacimientoHint"
         android:inputType="text"
         android:backgroundTint="@color/teal_700"
         android:padding="12dp"
@@ -132,7 +133,7 @@
         android:id="@+id/editTextDomicilio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Domicilio"
+        android:hint="@string/domicilioHint"
         android:inputType="text"
         android:backgroundTint="@color/teal_700"
         android:padding="12dp"
@@ -142,8 +143,10 @@
 
     <ImageButton
         android:id="@+id/btnFirma"
-        android:layout_width="380dp"
-        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:layout_width="190dp"
+        android:layout_height="40dp"
         android:src="@drawable/ic_signature"
         android:onClick="capturarFirma" />
 
@@ -158,7 +161,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Cancelar"
+            android:text="@string/cancelar_crear_tarjeta_dni"
             android:textColor="@android:color/white"
             android:background="@color/colorAccent"
             android:layout_marginEnd="4dp"/>
@@ -168,7 +171,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Crear"
+            android:text="@string/aceptar_crear_tarjeta_dni"
             android:textColor="@android:color/white"
             android:background="@color/colorAccent"
             android:layout_marginStart="4dp"/>

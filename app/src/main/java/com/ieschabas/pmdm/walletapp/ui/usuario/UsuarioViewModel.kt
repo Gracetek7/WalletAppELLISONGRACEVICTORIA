@@ -21,11 +21,12 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
 
     private val _tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
 
+    val tarjetasUsuario: LiveData<List<Tarjeta>> get() = _tarjetasUsuario
+
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<String>()
 
-    val tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
-    val error = MutableLiveData<String>()
+    val error: LiveData<String> get() = _error
 
     suspend fun cargarUsuarioActual(idUsuario: String) {
         _isLoading.value = true

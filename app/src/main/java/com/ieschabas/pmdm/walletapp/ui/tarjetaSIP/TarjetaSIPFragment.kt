@@ -136,7 +136,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
             viewModel.viewModelScope.launch {
                 val tarjetasSIP = viewModel.cargarTarjetaSIPUsuario(it)
                 // Verifica si se obtuvo una tarjeta SIP válida
-                tarjetasSIP.let { tarjeta ->
+                tarjetasSIP.let {
                     _binding?.tvNumeroSip?.text = getString(
                         R.string.numero_sip_template,
                         tarjetaSIP.numeroSip
