@@ -2,26 +2,78 @@ package com.ieschabas.pmdm.walletapp.ui.usuario
 
 import android.app.AlertDialog
 import android.content.Context
+import android.net.Uri
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.ieschabas.pmdm.walletapp.R
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.model.Usuario
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import kotlinx.coroutines.launch
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+
+interface UsuarioFragmentListener {
+    fun seleccionarFoto()
+    fun seleccionarFirma()
+}
 
 class UsuarioViewModel(private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModel() {
+
+
+    private var fragmentListener: UsuarioFragmentListener? = null
+
+    // Método para establecer el listener del fragmento
+    fun setFragmentListener(listener: UsuarioFragmentListener) {
+        fragmentListener = listener
+    }
+
+    // Método en el ViewModel que llama al método seleccionarFoto() del fragmento
+    fun llamarSeleccionarFoto() {
+        fragmentListener?.seleccionarFoto()
+    }
+    // Método en el ViewModel que llama al método seleccionarFirma() del fragmento
+    fun llamarSeleccionarFirma() {
+        fragmentListener?.seleccionarFirma()
+    }
 
     private val _usuarioActual = MutableLiveData<Usuario?>()
     val usuarioActual: MutableLiveData<Usuario?> get() = _usuarioActual
 
     private val _tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
-
     val tarjetasUsuario: LiveData<List<Tarjeta>> get() = _tarjetasUsuario
+
+
+    // LiveData para almacenar la URI de la foto seleccionada
+    private val _fotoSeleccionadaUrl = MutableLiveData<Uri?>()
+    val fotoSeleccionadaUrl: LiveData<Uri?> get() = _fotoSeleccionadaUrl
+
+    // LiveData para almacenar la URI de la firma seleccionada
+    private val _firmaSeleccionadaUrl = MutableLiveData<Uri?>()
+    val firmaSeleccionadaUrl: LiveData<Uri?> get() = _firmaSeleccionadaUrl
+
+
+    // Método para manejar el resultado de la selección de la foto
+    fun handleSeleccionFotoResult(uri: Uri?) {
+        _fotoSeleccionadaUrl.value = uri
+    }
+
+    // Método para manejar el resultado de la selección de la firma
+    fun handleSeleccionFirmaResult(uri: Uri?) {
+        _firmaSeleccionadaUrl.value = uri
+    }
+
 
     private val _isLoading = MutableLiveData<Boolean>()
     private val _error = MutableLiveData<String>()
@@ -69,16 +121,17 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         }
     }
 
-    fun mostrarFormularioCrearTarjetas(usuario: Usuario) {
+    fun mostrarFormularioCrearTarjetas(usuario: String) {
+        Log.d("UsuarioViewModel", "UsuarioViewModel, en el metodo de mostrar formulario crear tarjetas")
         val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación")
 
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Crear Tarjeta")
         builder.setItems(opcionesTarjeta) { dialog, which ->
-            val usuario = usuarioActual.value
+            val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
             usuario?.let { user ->
                 when (which) {
-                   // 0 -> mostrarDialogoCrearTarjetaDNI(user)
+                    0 -> mostrarDialogoCrearTarjetaDNI(user)
                     1 -> mostrarDialogoCrearTarjetaSIP()
                     2 -> mostrarDialogoCrearTarjetaPermiso()
                 }
@@ -89,134 +142,144 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         dialog.show()
     }
 
-//    private fun mostrarDialogoCrearTarjetaDNI(usuario: Usuario) {
-//        val dialogView =
-//            LayoutInflater.from(context).inflate(R.layout.dialogo_crear_tarjeta_dni, null)
-//
-//        val editTextNumeroDocumento =
-//            dialogView.findViewById<EditText>(R.id.editTextNumeroDocumento)
-//        val editTextFechaNacimiento =
-//            dialogView.findViewById<EditText>(R.id.editTextFechaNacimiento)
-//        val editTextFechaExpedicion =
-//            dialogView.findViewById<EditText>(R.id.editTextFechaExpedicion)
-//        val editTextNombre = dialogView.findViewById<EditText>(R.id.editTextNombre)
-//        val editTextApellidos = dialogView.findViewById<EditText>(R.id.editTextApellidos)
-//        val editTextNacionalidad = dialogView.findViewById<EditText>(R.id.editTextNacionalidad)
-//        val editTextLugarNacimiento =
-//            dialogView.findViewById<EditText>(R.id.editTextLugarNacimiento)
-//        val editTextDomicilio = dialogView.findViewById<EditText>(R.id.editTextDomicilio)
-//        val buttonFotografiaUrl = dialogView.findViewById<Button>(R.id.btnSeleccionarFoto)
-//        val buttonTextFirmaUrl = dialogView.findViewById<Button>(R.id.btnFirma)
-//
-//        AlertDialog.Builder(context)
-//            .setTitle("Crear Tarjeta DNI")
-//            .setView(dialogView)
-//            .setPositiveButton("Crear") { dialog, _ ->
-//                val numeroDocumento = editTextNumeroDocumento.text.toString()
-//                val fechaNacimiento = editTextFechaNacimiento.text.toString()
-//                val fechaExpedicion = editTextFechaExpedicion.text.toString()
-//                val nombre = editTextNombre.text.toString()
-//                val apellidos = editTextApellidos.text.toString()
-//                val nacionalidad = editTextNacionalidad.text.toString()
-//                val lugarNacimiento = editTextLugarNacimiento.text.toString()
-//                val domicilio = editTextDomicilio.text.toString()
-//                val fotografiaUrl = buttonFotografiaUrl.text.toString()
-//                val firmaUrl = buttonTextFirmaUrl.text.toString()
-//
-//
-//                viewModelScope.launch {
-//                    crearTarjetaDNI(
-//                        numeroDocumento,
-//                        fechaNacimiento,
-//                        fechaExpedicion,
-//                        nombre,
-//                        apellidos,
-//                        usuario,
-//                        nacionalidad,
-//                        lugarNacimiento,
-//                        domicilio,
-//                        fotografiaUrl,
-//                        firmaUrl
-//                    )
-//                }
-//
-//                dialog.dismiss()
-//            }
-//            .setNegativeButton("Cancelar") { dialog, _ ->
-//                dialog.dismiss()
-//            }
-//            .show()
-//    }
+    private fun mostrarDialogoCrearTarjetaDNI(usuario: String) {
+        Log.d("UsuarioViewModel", "en el metodo de mostrar Dialogo crear tarjeta DNI")
 
-    private fun seleccionarFoto() {
-        // Aquí puedes abrir la galería o iniciar la cámara para que el usuario seleccione o tome una foto
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialogo_crear_tarjeta_dni, null)
+
+        val editTextNumeroDocumento = dialogView.findViewById<EditText>(R.id.editTextNumeroDocumento)
+        val editTextFechaNacimiento = dialogView.findViewById<EditText>(R.id.editTextFechaNacimiento)
+        val editTextFechaExpedicion = dialogView.findViewById<EditText>(R.id.editTextFechaExpedicion)
+        val editTextNombre = dialogView.findViewById<EditText>(R.id.editTextNombre)
+        val editTextApellidos = dialogView.findViewById<EditText>(R.id.editTextApellidos)
+        val editTextNacionalidad = dialogView.findViewById<EditText>(R.id.editTextNacionalidad)
+        val editTextLugarNacimiento = dialogView.findViewById<EditText>(R.id.editTextLugarNacimiento)
+        val editTextDomicilio = dialogView.findViewById<EditText>(R.id.editTextDomicilio)
+        val buttonFotografiaUrl = dialogView.findViewById<AppCompatImageButton>(R.id.btnSeleccionarFoto)
+        val buttonTextFirmaUrl = dialogView.findViewById<AppCompatImageButton>(R.id.btnSeleccionarFirma)
+
+        val alertDialog = AlertDialog.Builder(context)
+            .setTitle("Crear Tarjeta DNI")
+            .setView(dialogView)
+            .setPositiveButton("Crear") { dialog, _ ->
+                val numeroDocumento = editTextNumeroDocumento.text.toString()
+                val fechaNacimiento = editTextFechaNacimiento.text.toString()
+                val fechaExpedicion = editTextFechaExpedicion.text.toString()
+                val nombre = editTextNombre.text.toString()
+                val apellidos = editTextApellidos.text.toString()
+                val nacionalidad = editTextNacionalidad.text.toString()
+                val lugarNacimiento = editTextLugarNacimiento.text.toString()
+                val domicilio = editTextDomicilio.text.toString()
+
+                val fotografiaUrl = fotoSeleccionadaUrl.value // Obtener la URI de la foto seleccionada
+                val firmaUrl = firmaSeleccionadaUrl.value // Obtener la URI de la firma seleccionada
+
+                if (fotografiaUrl != null && firmaUrl != null) {
+                    // Si se han seleccionado tanto la foto como la firma
+                    viewModelScope.launch {
+                        try {
+                            crearTarjetaDNI(
+                                numeroDocumento,
+                                fechaNacimiento,
+                                fechaExpedicion,
+                                nombre,
+                                apellidos,
+                                usuario,
+                                nacionalidad,
+                                lugarNacimiento,
+                                domicilio,
+                                fotografiaUrl.toString(),
+                                firmaUrl.toString()
+                            )
+                        } catch (e: Exception) {
+                            _error.postValue("Error al crear la tarjeta DNI: ${e.message}")
+                        }
+                    }
+                } else {
+                    // Si falta seleccionar alguna de las imágenes, mostrar un mensaje de error
+                    _error.postValue("Por favor, seleccione tanto la foto como la firma.")
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        // Configurar el botón para seleccionar la foto
+        buttonFotografiaUrl.setOnClickListener {
+            llamarSeleccionarFoto()
+        }
+
+        // Configurar el botón para seleccionar la firma
+        buttonTextFirmaUrl.setOnClickListener {
+            llamarSeleccionarFirma()
+        }
+
+        alertDialog.show()
     }
 
-    private fun capturarFirma() {
-        // Aquí puedes abrir una vista para que el usuario dibuje su firma y la captures
-    }
+    suspend fun crearTarjetaDNI(
+        numeroDocumento: String,
+        fechaNacimiento: String,
+        fechaExpedicion: String,
+        nombre: String,
+        apellidos: String,
+        usuario: String,
+        nacionalidad: String,
+        lugarNacimiento: String,
+        domicilio: String,
+        fotografiaUrl: String,
+        firmaUrl: String
+    ) {
+        try {
+            // Construir un objeto Date a partir de las cadenas de fecha proporcionadas
+            val fechaNacimientoDate =
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaNacimiento)
+            val fechaExpedicionDate =
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaExpedicion)
 
-//    suspend fun crearTarjetaDNI(
-//        numeroDocumento: String,
-//        fechaNacimiento: String,
-//        fechaExpedicion: String,
-//        nombre: String,
-//        apellidos: String,
-//        usuario: Usuario,
-//        nacionalidad: String,
-//        lugarNacimiento: String,
-//        domicilio: String,
-//        fotografiaUrl: String,
-//        firmaUrl: String
-//    ) {
-//        try {
-//            // Construir un objeto Date a partir de las cadenas de fecha proporcionadas
-//            val fechaNacimientoDate =
-//                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaNacimiento)
-//            val fechaExpedicionDate =
-//                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaExpedicion)
-//
-//            // Crear la nueva tarjeta DNI con los datos proporcionados
-//            val nuevaTarjeta = Tarjeta.TarjetaDNI(
-//                idUsuario = usuario.id,
-//                numeroDocumento = numeroDocumento,
-//                fechaNacimiento = fechaNacimientoDate!!,
-//                fechaExpedicion = fechaExpedicionDate!!,
-//                fechaCaducidad = calcularFechaCaducidad(fechaExpedicionDate),
-//                nombre = nombre,
-//                apellidos = apellidos,
-//                sexo = obtenerSexoDesdeUsuario(usuario),
-//                nacionalidad = nacionalidad,
-//                lugarNacimiento = lugarNacimiento,
-//                domicilio = domicilio,
-//                fotografiaUrl = fotografiaUrl,
-//                firmaUrl = firmaUrl
-//            )
-//
-//            // Llama al método en el repositorio para insertar la nueva tarjeta DNI
-//            crearTarjetaDNI(nuevaTarjeta)
-//        } catch (e: ParseException) {
-//            _error.postValue("Error al parsear la fecha: ${e.message}")
-//        }
-//    }
+            // Crear la nueva tarjeta DNI con los datos proporcionados
+            val nuevaTarjeta = Tarjeta.TarjetaDNI(
+                idUsuario = usuario,
+                numeroDocumento = numeroDocumento,
+                fechaNacimiento = fechaNacimientoDate!!,
+                fechaExpedicion = fechaExpedicionDate!!,
+                fechaCaducidad = calcularFechaCaducidad(fechaExpedicionDate),
+                nombre = nombre,
+                apellidos = apellidos,
+                sexo = obtenerSexoDesdeUsuario(usuario),
+                nacionalidad = nacionalidad,
+                lugarNacimiento = lugarNacimiento,
+                domicilio = domicilio,
+                fotografiaUrl = fotografiaUrl,
+                firmaUrl = firmaUrl
+            )
+
+            // Llama al método en el repositorio para insertar la nueva tarjeta DNI
+            crearTarjetaDNI(nuevaTarjeta)
+        } catch (e: ParseException) {
+            _error.postValue("Error al parsear la fecha: ${e.message}")
+        }
+    }
 
     suspend fun crearTarjetaDNI(nuevaTarjeta: Tarjeta.TarjetaDNI) {
-        _isLoading.value = true
+        _isLoading.postValue(true)
         try {
             val response = tarjetasRepository.insertarTarjetaDNI(nuevaTarjeta)
             if (response != null && response.isSuccessful) {
                 Log.i("TAG", "Se ha creado la tarjeta DNI correctamente.")
             } else {
-                _error.postValue("Error al actualizar el usuario")
+                _error.postValue("Error al crear la tarjeta DNI")
             }
         } catch (e: Exception) {
-            _error.postValue("Error al actualizar el usuario: ${e.message}")
+            _error.postValue("Error al crear la tarjeta DNI: ${e.message}")
         } finally {
-            _isLoading.value = false
+            _isLoading.postValue(false)
         }
     }
 
-    private fun obtenerSexoDesdeUsuario(usuario: Usuario): Tarjeta.Sexo {
+    private fun obtenerSexoDesdeUsuario(usuario: String): Tarjeta.Sexo {
         return Tarjeta.Sexo.MASCULINO
     }
 
@@ -227,7 +290,6 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         calendar.add(Calendar.YEAR, 10)
         return calendar.time
     }
-
 
     // Muestra el diálogo para la Tarjeta SIP
     private fun mostrarDialogoCrearTarjetaSIP() {

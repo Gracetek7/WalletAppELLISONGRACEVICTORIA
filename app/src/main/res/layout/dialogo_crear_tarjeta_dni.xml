@@ -142,7 +142,7 @@
         android:layout_marginBottom="8dp"/>
 
     <ImageButton
-        android:id="@+id/btnFirma"
+        android:id="@+id/btnSeleccionarFirma"
         android:layout_gravity="center"
         android:layout_marginBottom="40dp"
         android:layout_width="190dp"
