@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -67,11 +68,13 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
     // Método para manejar el resultado de la selección de la foto
     fun handleSeleccionFotoResult(uri: Uri?) {
         _fotoSeleccionadaUrl.value = uri
+        Log.d("UsuarioViewModel", "URI de la foto seleccionada: $uri")
     }
 
     // Método para manejar el resultado de la selección de la firma
     fun handleSeleccionFirmaResult(uri: Uri?) {
         _firmaSeleccionadaUrl.value = uri
+        Log.d("UsuarioViewModel", "URI de la firma seleccionada: $uri")
     }
 
 
@@ -155,8 +158,8 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         val editTextNacionalidad = dialogView.findViewById<EditText>(R.id.editTextNacionalidad)
         val editTextLugarNacimiento = dialogView.findViewById<EditText>(R.id.editTextLugarNacimiento)
         val editTextDomicilio = dialogView.findViewById<EditText>(R.id.editTextDomicilio)
-        val buttonFotografiaUrl = dialogView.findViewById<AppCompatImageButton>(R.id.btnSeleccionarFoto)
-        val buttonTextFirmaUrl = dialogView.findViewById<AppCompatImageButton>(R.id.btnSeleccionarFirma)
+        val buttonFotografiaUrl = dialogView.findViewById<ImageView>(R.id.btnSeleccionarFoto)
+        val buttonTextFirmaUrl = dialogView.findViewById<ImageView>(R.id.btnSeleccionarFirma)
 
         val alertDialog = AlertDialog.Builder(context)
             .setTitle("Crear Tarjeta DNI")
@@ -216,6 +219,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             llamarSeleccionarFirma()
         }
 
+
         alertDialog.show()
     }
 
@@ -263,6 +267,8 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         }
     }
 
+
+
     suspend fun crearTarjetaDNI(nuevaTarjeta: Tarjeta.TarjetaDNI) {
         _isLoading.postValue(true)
         try {
@@ -271,6 +277,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                 Log.i("TAG", "Se ha creado la tarjeta DNI correctamente.")
             } else {
                 _error.postValue("Error al crear la tarjeta DNI")
+                Log.d("Error UsuarioViewModel", "Error al crear la tarjeta DNI")
             }
         } catch (e: Exception) {
             _error.postValue("Error al crear la tarjeta DNI: ${e.message}")

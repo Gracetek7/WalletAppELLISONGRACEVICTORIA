@@ -11,7 +11,6 @@ android {
     defaultConfig {
         applicationId = "com.ieschabas.pmdm.walletapp"
         minSdk = 21
-        maxSdk = 32
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
