@@ -27,6 +27,8 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
 
+    private var dialog: AlertDialog? = null
+
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
 
@@ -127,25 +129,21 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
 
     // Método para mostrar la imagen seleccionada en un diálogo
     private fun mostrarImagenesSeleccionadas(uriFoto: Uri?, uriFirma: Uri?) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialogo_crear_tarjeta_dni, null)
-        val imageViewFoto = dialogView.findViewById<ImageView>(R.id.btnSeleccionarFoto)
-        val imageViewFirma = dialogView.findViewById<ImageView>(R.id.btnSeleccionarFirma)
 
         // Configura las imágenes seleccionadas en los ImageViews del diálogo
-        uriFoto?.let {
-            imageViewFoto.setImageURI(uriFoto)
-        }
-        uriFirma?.let {
-            imageViewFirma.setImageURI(uriFirma)
-        }
-
-        // Crea y muestra el diálogo
-        AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .setPositiveButton("Aceptar") { dialog, _ ->
-                dialog.dismiss()
+        dialog?.let { dialog ->
+            uriFoto?.let {
+                dialog.findViewById<ImageView>(R.id.btnSeleccionarFoto)?.setImageURI(uriFoto)
             }
-            .show()
+            uriFirma?.let {
+                dialog.findViewById<ImageView>(R.id.btnSeleccionarFirma)?.setImageURI(uriFirma)
+            }
+
+            // Muestra el diálogo si no está siendo mostrado actualmente
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+        }
     }
 
     private var isSelectingPhoto: Boolean = true

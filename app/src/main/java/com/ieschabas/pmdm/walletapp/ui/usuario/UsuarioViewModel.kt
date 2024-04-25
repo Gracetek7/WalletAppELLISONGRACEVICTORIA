@@ -5,10 +5,9 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageButton
+import android.widget.Spinner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,6 +17,7 @@ import com.ieschabas.pmdm.walletapp.R
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.model.Usuario
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -132,7 +132,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         builder.setTitle("Crear Tarjeta")
         builder.setItems(opcionesTarjeta) { dialog, which ->
             val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
-            usuario?.let { user ->
+            usuario.let { user ->
                 when (which) {
                     0 -> mostrarDialogoCrearTarjetaDNI(user)
                     1 -> mostrarDialogoCrearTarjetaSIP()
@@ -153,6 +153,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         val editTextNumeroDocumento = dialogView.findViewById<EditText>(R.id.editTextNumeroDocumento)
         val editTextFechaNacimiento = dialogView.findViewById<EditText>(R.id.editTextFechaNacimiento)
         val editTextFechaExpedicion = dialogView.findViewById<EditText>(R.id.editTextFechaExpedicion)
+        val editTextFechaCaducidad = dialogView.findViewById<EditText>(R.id.editTextFechaCaducidad)
         val editTextNombre = dialogView.findViewById<EditText>(R.id.editTextNombre)
         val editTextApellidos = dialogView.findViewById<EditText>(R.id.editTextApellidos)
         val editTextNacionalidad = dialogView.findViewById<EditText>(R.id.editTextNacionalidad)
@@ -166,13 +167,20 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             .setView(dialogView)
             .setPositiveButton("Crear") { dialog, _ ->
                 val numeroDocumento = editTextNumeroDocumento.text.toString()
-                val fechaNacimiento = editTextFechaNacimiento.text.toString()
-                val fechaExpedicion = editTextFechaExpedicion.text.toString()
+                val fechaNacimientoStr = editTextFechaNacimiento.text.toString()
+                val fechaExpedicionStr = editTextFechaExpedicion.text.toString()
+                val fechaCaducidadStr = editTextFechaCaducidad.text.toString()
                 val nombre = editTextNombre.text.toString()
                 val apellidos = editTextApellidos.text.toString()
                 val nacionalidad = editTextNacionalidad.text.toString()
                 val lugarNacimiento = editTextLugarNacimiento.text.toString()
                 val domicilio = editTextDomicilio.text.toString()
+
+                val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+                val fechaNacimiento = inputFormat.parse(fechaNacimientoStr)!!
+                val fechaExpedicion = inputFormat.parse(fechaExpedicionStr)!!
+                val fechaCaducidad = inputFormat.parse(fechaCaducidadStr)!!
 
                 val fotografiaUrl = fotoSeleccionadaUrl.value // Obtener la URI de la foto seleccionada
                 val firmaUrl = firmaSeleccionadaUrl.value // Obtener la URI de la firma seleccionada
@@ -185,6 +193,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                                 numeroDocumento,
                                 fechaNacimiento,
                                 fechaExpedicion,
+                                fechaCaducidad,
                                 nombre,
                                 apellidos,
                                 usuario,
@@ -202,8 +211,13 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                     // Si falta seleccionar alguna de las imágenes, mostrar un mensaje de error
                     _error.postValue("Por favor, seleccione tanto la foto como la firma.")
                 }
+//                } else {
+//                    // Mostrar mensaje de error si las fechas ingresadas no son válidas
+//                    _error.postValue("Por favor, ingrese fechas válidas en formato dd/MM/yyyy.")
+//                }
                 dialog.dismiss()
             }
+
             .setNegativeButton("Cancelar") { dialog, _ ->
                 dialog.dismiss()
             }
@@ -211,22 +225,53 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
 
         // Configurar el botón para seleccionar la foto
         buttonFotografiaUrl.setOnClickListener {
+            // Llamar al método para seleccionar la foto
             llamarSeleccionarFoto()
         }
 
         // Configurar el botón para seleccionar la firma
         buttonTextFirmaUrl.setOnClickListener {
+            // Llamar al método para seleccionar la firma
             llamarSeleccionarFirma()
         }
 
+        // Observar los cambios en la URI de la foto seleccionada
+        _fotoSeleccionadaUrl.observeForever { fotoUri: Uri? ->
+            fotoUri?.let { uri ->
+                // Cargar la imagen seleccionada en el ImageView correspondiente con Picasso
+                Picasso.get().load(uri).into(buttonFotografiaUrl)
+            }
+        }
+
+        // Observar los cambios en la URI de la firma seleccionada
+        _firmaSeleccionadaUrl.observeForever { firmaUri: Uri? ->
+            firmaUri?.let { uri ->
+                // Cargar la imagen seleccionada en el ImageView correspondiente con Picasso
+                Picasso.get().load(uri).into(buttonTextFirmaUrl)
+            }
+        }
 
         alertDialog.show()
     }
 
+
+    private fun validarFechas(vararg fechas: String): Boolean {
+        val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        for (fecha in fechas) {
+            try {
+                formatoFecha.parse(fecha)
+            } catch (e: ParseException) {
+                return false
+            }
+        }
+        return true
+    }
+
     suspend fun crearTarjetaDNI(
         numeroDocumento: String,
-        fechaNacimiento: String,
-        fechaExpedicion: String,
+        fechaNacimiento: Date,
+        fechaExpedicion: Date,
+        fechaCaducidad: Date,
         nombre: String,
         apellidos: String,
         usuario: String,
@@ -237,19 +282,14 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         firmaUrl: String
     ) {
         try {
-            // Construir un objeto Date a partir de las cadenas de fecha proporcionadas
-            val fechaNacimientoDate =
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaNacimiento)
-            val fechaExpedicionDate =
-                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(fechaExpedicion)
-
             // Crear la nueva tarjeta DNI con los datos proporcionados
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             val nuevaTarjeta = Tarjeta.TarjetaDNI(
                 idUsuario = usuario,
                 numeroDocumento = numeroDocumento,
-                fechaNacimiento = fechaNacimientoDate!!,
-                fechaExpedicion = fechaExpedicionDate!!,
-                fechaCaducidad = calcularFechaCaducidad(fechaExpedicionDate),
+                fechaNacimiento = fechaNacimiento,
+                fechaExpedicion = fechaExpedicion,
+                fechaCaducidad = fechaCaducidad,
                 nombre = nombre,
                 apellidos = apellidos,
                 sexo = obtenerSexoDesdeUsuario(usuario),
@@ -261,15 +301,13 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             )
 
             // Llama al método en el repositorio para insertar la nueva tarjeta DNI
-            crearTarjetaDNI(nuevaTarjeta)
+            crearTarjetaDNIDesdeObjeto(nuevaTarjeta)
         } catch (e: ParseException) {
-            _error.postValue("Error al parsear la fecha: ${e.message}")
+            _error.postValue("Error al parsear la fecha: ${e.message}" +fechaNacimiento+ fechaExpedicion)
         }
     }
 
-
-
-    suspend fun crearTarjetaDNI(nuevaTarjeta: Tarjeta.TarjetaDNI) {
+    suspend fun crearTarjetaDNIDesdeObjeto(nuevaTarjeta: Tarjeta.TarjetaDNI) {
         _isLoading.postValue(true)
         try {
             val response = tarjetasRepository.insertarTarjetaDNI(nuevaTarjeta)
@@ -289,7 +327,6 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
     private fun obtenerSexoDesdeUsuario(usuario: String): Tarjeta.Sexo {
         return Tarjeta.Sexo.MASCULINO
     }
-
 
     private fun calcularFechaCaducidad(fechaExpedicion: Date): Date {
         val calendar = Calendar.getInstance()
