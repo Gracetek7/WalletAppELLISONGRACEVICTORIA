@@ -176,11 +176,13 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                 val lugarNacimiento = editTextLugarNacimiento.text.toString()
                 val domicilio = editTextDomicilio.text.toString()
 
-                val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val formatoInput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-                val fechaNacimiento = inputFormat.parse(fechaNacimientoStr)!!
-                val fechaExpedicion = inputFormat.parse(fechaExpedicionStr)!!
-                val fechaCaducidad = inputFormat.parse(fechaCaducidadStr)!!
+                val fechaNacimiento: Date? = formatoInput.parse(fechaNacimientoStr)
+
+                val fechaExpedicion: Date? = formatoInput.parse(fechaExpedicionStr)
+
+                val fechaCaducidad: Date? = formatoInput.parse(fechaCaducidadStr)
 
                 val fotografiaUrl = fotoSeleccionadaUrl.value // Obtener la URI de la foto seleccionada
                 val firmaUrl = firmaSeleccionadaUrl.value // Obtener la URI de la firma seleccionada
@@ -189,20 +191,24 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                     // Si se han seleccionado tanto la foto como la firma
                     viewModelScope.launch {
                         try {
-                            crearTarjetaDNI(
-                                numeroDocumento,
-                                fechaNacimiento,
-                                fechaExpedicion,
-                                fechaCaducidad,
-                                nombre,
-                                apellidos,
-                                usuario,
-                                nacionalidad,
-                                lugarNacimiento,
-                                domicilio,
-                                fotografiaUrl.toString(),
-                                firmaUrl.toString()
-                            )
+                            if (fechaNacimiento != null) {
+                                if (fechaExpedicion != null) {
+                                    crearTarjetaDNI(
+                                        numeroDocumento,
+                                        fechaNacimiento,
+                                        fechaExpedicion,
+                                        fechaCaducidad!!,
+                                        nombre,
+                                        apellidos,
+                                        usuario,
+                                        nacionalidad,
+                                        lugarNacimiento,
+                                        domicilio,
+                                        fotografiaUrl.toString(),
+                                        firmaUrl.toString()
+                                    )
+                                }
+                            }
                         } catch (e: Exception) {
                             _error.postValue("Error al crear la tarjeta DNI: ${e.message}")
                         }
@@ -254,19 +260,6 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         alertDialog.show()
     }
 
-
-    private fun validarFechas(vararg fechas: String): Boolean {
-        val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        for (fecha in fechas) {
-            try {
-                formatoFecha.parse(fecha)
-            } catch (e: ParseException) {
-                return false
-            }
-        }
-        return true
-    }
-
     suspend fun crearTarjetaDNI(
         numeroDocumento: String,
         fechaNacimiento: Date,
@@ -283,8 +276,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
     ) {
         try {
             // Crear la nueva tarjeta DNI con los datos proporcionados
-            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val nuevaTarjeta = Tarjeta.TarjetaDNI(
+              val nuevaTarjeta = Tarjeta.TarjetaDNI(
                 idUsuario = usuario,
                 numeroDocumento = numeroDocumento,
                 fechaNacimiento = fechaNacimiento,
