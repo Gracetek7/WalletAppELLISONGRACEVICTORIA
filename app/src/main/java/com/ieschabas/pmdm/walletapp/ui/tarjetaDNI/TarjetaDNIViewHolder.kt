@@ -11,9 +11,8 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 
-// Mostrar tarjeta DNI en recyclerView de usuario fragment
+// Muestra la tarjeta DNI en recyclerView de usuario fragment
 class TarjetaDNViewHolder(private val binding: ItemTarjetaDniBinding, private val listener: TarjetasAdapter.OnTarjetaClickListener) :
     RecyclerView.ViewHolder(binding.root) {
 
@@ -31,8 +30,13 @@ class TarjetaDNViewHolder(private val binding: ItemTarjetaDniBinding, private va
         binding.tvLugarNacimiento.text = resources.getString(R.string.lugar_nacimiento_template, resources.getString(R.string.lugar_de_nacimiento), tarjetaDNI.lugarNacimiento)
         binding.tvDomicilio.text = resources.getString(R.string.domicilio_template, resources.getString(R.string.domicilio), tarjetaDNI.domicilio)
 
-        Picasso.get().load(tarjetaDNI.fotografiaUrl).into(binding.ivFotografia)
-        Picasso.get().load(tarjetaDNI.firmaUrl).into(binding.ivFirma)
+        tarjetaDNI.fotografiaUrl.let { url ->
+            Picasso.get().load(url).into(binding.ivFotografia)
+        }
+        tarjetaDNI.firmaUrl.let { url ->
+
+            Picasso.get().load(url).into(binding.ivFirma)
+        }
 
         // Configuración de clics
         binding.root.setOnClickListener {
@@ -52,13 +56,6 @@ class TarjetaDNViewHolder(private val binding: ItemTarjetaDniBinding, private va
             return ""
         }
 
-        // Define el patrón de formato de fecha adecuado para la fecha recibida
-        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.getDefault())
-
-        // Establece la zona horaria GMT para asegurar la consistencia en el formato
-        dateFormat.timeZone = TimeZone.getTimeZone("GMT")
-
-        // Formatea la fecha
-        return dateFormat.format(date)
+        return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
     }
 }

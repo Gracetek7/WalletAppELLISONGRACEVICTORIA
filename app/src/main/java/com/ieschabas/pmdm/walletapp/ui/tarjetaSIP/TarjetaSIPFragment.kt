@@ -6,7 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
+import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -17,10 +18,7 @@ import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaSipBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
-import com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioViewModel
-import com.ieschabas.pmdm.walletapp.ui.usuario.UsuarioViewModelFactory
 import kotlinx.coroutines.launch
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,10 +28,12 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
     constructor() : this(TarjetasRepository(TarjetasApi()))
 
     private lateinit var viewModel: TarjetaSIPViewModel
-    private lateinit var tarjetaSIP: Tarjeta.TarjetaSIP
+    private var tarjetaSIP: Tarjeta.TarjetaSIP? = null
 
     private var _binding: FragmentTarjetaSipBinding? = null
     private val binding get() = _binding!!
+
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,78 +56,44 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
             // Inicializar tarjetaSIP dentro de la coroutine
             tarjetaSIP = obtenerTarjetaSIP()
 
-            cargarTarjetaSIPUsuario(tarjetaSIP)
+            tarjetaSIP?.let { cargarTarjetaSIPUsuario(it) }
 
             // Configurar clic en la tarjeta para modificar
             binding.root.setOnClickListener {
-                //abrirFormularioModificacion(tarjeta)
+                mostrarDialogoModificar(tarjetaSIP!!)
             }
 
             // Configurar clic largo en la tarjeta para eliminar
             binding.root.setOnLongClickListener {
-                mostrarDialogoEliminar(id)
+                mostrarDialogoEliminar(tarjetaSIP!!)
                 true
             }
         }
     }
 
-    private suspend fun obtenerTarjetaSIP(): Tarjeta.TarjetaSIP {
-        val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
-
+    private suspend fun obtenerTarjetaSIP(): Tarjeta.TarjetaSIP? {
         // Verificar si el usuario está autenticado
         usuarioId?.let {
             try {
-                // Obtener la tarjeta SIP del repositorio
+                // Obtener la tarjeta DNI del repositorio
                 val tarjetasSIP = repository.obtenerTarjetaSIPUsuario(it)
-                // Si se obtiene al menos una tarjeta SIP, tomar la primera (asumiendo que solo hay una por usuario)
-                if (tarjetasSIP.isNotEmpty()) {
+                // Si se obtiene al menos una tarjeta DNI, tomar la primera (asumiendo que solo hay una por usuario)
+                if (tarjetasSIP.isNotEmpty() && tarjetasSIP[0].numeroSip.isNotEmpty()) {
                     return tarjetasSIP[0]
                 } else {
-                    // Si no se encuentra ninguna tarjeta SIP, devolver una tarjeta SIP vacía o lanzar una excepción según tu lógica
-                    return Tarjeta.TarjetaSIP(
-                        idUsuario = it,
-                        numeroSip = "",
-                        digitoControl = "",
-                        codigoIdentificacionTerritorial = "",
-                        datosIdentificacion = "",
-                        codigoSns = "",
-                        fechaEmision = Date(),
-                        fechaCaducidad = Date(),
-                        telefonoUrgencias = "",
-                        numeroSeguridadSocial = "",
-                        centroMedico = "",
-                        medicoAsignado = "",
-                        enfermeraAsignada = "",
-                        telefonosUrgenciasCitaPrevia = "",
-                        apellidosNombre = ""
-                    )
+                    // Si no se encuentra ninguna tarjeta DNI válida, devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
+                    return null
                 }
             } catch (e: Exception) {
-                Log.e("TarjetaSIPFragment", "Error al obtener la tarjeta SIP del usuario: ${e.message}")
-                // Lanzar una excepción si ocurre un error al obtener la tarjeta SIP
+                Log.e("TarjetaDNIFragment", "Error al obtener la tarjeta DNI del usuario: ${e.message}")
+                // Lanzar una excepción si ocurre un error al obtener la tarjeta DNI
                 throw e
             }
         }
-
-        // Si el usuario no está autenticado, puedes devolver una tarjeta SIP vacía o lanzar una excepción según tu lógica
-        return Tarjeta.TarjetaSIP(
-            idUsuario = "",
-            numeroSip = "",
-            digitoControl = "",
-            codigoIdentificacionTerritorial = "",
-            datosIdentificacion = "",
-            codigoSns = "",
-            fechaEmision = Date(),
-            fechaCaducidad = Date(),
-            telefonoUrgencias = "",
-            numeroSeguridadSocial = "",
-            centroMedico = "",
-            medicoAsignado = "",
-            enfermeraAsignada = "",
-            telefonosUrgenciasCitaPrevia = "",
-            apellidosNombre = ""
-        )
+        // Si el usuario no está autenticado, puedes devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
+        return null
     }
+
 
     private fun cargarTarjetaSIPUsuario(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
@@ -159,7 +125,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
                     )
                     _binding?.tvFechaEmisionUsuario?.text = formatDate(tarjetaSIP.fechaEmision)
                     _binding?.tvFechaCaducidadUsuario?.text = formatDate(tarjetaSIP.fechaCaducidad)
-
                     _binding?.tvTelefonoUrgencias?.text = getString(
                         R.string.telefono_urgencias_template,
                         tarjetaSIP.telefonoUrgencias
@@ -193,6 +158,104 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
     }
 
+    private fun mostrarDialogoModificar(tarjetaSIP: Tarjeta.TarjetaSIP) {
+        val builder = AlertDialog.Builder(requireContext())
+        val inflater = requireActivity().layoutInflater
+        val dialogLayout = inflater.inflate(R.layout.dialogo_crear_tarjeta_sip, null)
+
+        val etNumeroSip = dialogLayout.findViewById<EditText>(R.id.tvNumeroSip)
+        val etDigitoControl = dialogLayout.findViewById<EditText>(R.id.tvDigitoControl)
+        val etCodigoIdentificacionTerritorial = dialogLayout.findViewById<EditText>(R.id.tvCodigoIdentificacionTerritorial)
+        val etDatosIdentificacion = dialogLayout.findViewById<EditText>(R.id.tvDatosIdentificacion)
+        val etCodigoSns = dialogLayout.findViewById<EditText>(R.id.tvCodigoSns)
+        val etFechaEmision = dialogLayout.findViewById<EditText>(R.id.tvFechaEmisionUsuario)
+        val etFechaCaducidad = dialogLayout.findViewById<EditText>(R.id.editTextFechaCaducidad)
+        val etTelefonoUrgencias = dialogLayout.findViewById<EditText>(R.id.tvTelefonoUrgencias)
+        val etNumeroSeguridadSocial = dialogLayout.findViewById<EditText>(R.id.tvNumeroSeguridadSocial)
+        val etCentroMedico = dialogLayout.findViewById<EditText>(R.id.tvCentroMedico)
+        val etMedicoAsignado = dialogLayout.findViewById<EditText>(R.id.tvMedicoAsignadoUsuario)
+        val etEnfermeraAsignada = dialogLayout.findViewById<EditText>(R.id.tvEnfermeraAsignadaUsuario)
+        val etTelefonosUrgenciasCitaPrevia = dialogLayout.findViewById<EditText>(R.id.tvTelefonosUrgenciasCitaPrevia)
+        val etApellidosNombre = dialogLayout.findViewById<EditText>(R.id.tvApellidosNombreUsuario)
+
+        // Establecer los valores actuales de la tarjeta SIP en los EditText
+        etNumeroSip.setText(tarjetaSIP.numeroSip)
+        etDigitoControl.setText(tarjetaSIP.digitoControl)
+        etCodigoIdentificacionTerritorial.setText(tarjetaSIP.codigoIdentificacionTerritorial)
+        etDatosIdentificacion.setText(tarjetaSIP.datosIdentificacion)
+        etCodigoSns.setText(tarjetaSIP.codigoSns)
+        etFechaEmision.setText(formatDate(tarjetaSIP.fechaEmision))
+        etFechaCaducidad.setText(formatDate(tarjetaSIP.fechaCaducidad))
+        etTelefonoUrgencias.setText(tarjetaSIP.telefonoUrgencias)
+        etNumeroSeguridadSocial.setText(tarjetaSIP.numeroSeguridadSocial)
+        etCentroMedico.setText(tarjetaSIP.centroMedico)
+        etMedicoAsignado.setText(tarjetaSIP.medicoAsignado)
+        etEnfermeraAsignada.setText(tarjetaSIP.enfermeraAsignada)
+        etTelefonosUrgenciasCitaPrevia.setText(tarjetaSIP.telefonosUrgenciasCitaPrevia)
+        etApellidosNombre.setText(tarjetaSIP.apellidosNombre)
+
+        builder.setView(dialogLayout)
+            .setPositiveButton("Guardar") { dialogInterface, _ ->
+                // Obtener los nuevos valores de los EditText
+                val nuevoNumeroSip = etNumeroSip.text.toString()
+                val nuevoDigitoControl = etDigitoControl.text.toString()
+                val nuevoCodigoIdentificacionTerritorial = etCodigoIdentificacionTerritorial.text.toString()
+                val nuevosDatosIdentificacion = etDatosIdentificacion.text.toString()
+                val nuevoCodigoSns = etCodigoSns.text.toString()
+                val nuevaFechaEmision = parseDate(etFechaEmision.text.toString())
+                val nuevaFechaCaducidad = parseDate(etFechaCaducidad.text.toString())
+                val nuevoTelefonoUrgencias = etTelefonoUrgencias.text.toString()
+                val nuevoNumeroSeguridadSocial = etNumeroSeguridadSocial.text.toString()
+                val nuevoCentroMedico = etCentroMedico.text.toString()
+                val nuevoMedicoAsignado = etMedicoAsignado.text.toString()
+                val nuevaEnfermeraAsignada = etEnfermeraAsignada.text.toString()
+                val nuevosTelefonosUrgenciasCitaPrevia = etTelefonosUrgenciasCitaPrevia.text.toString()
+                val nuevosApellidosNombre = etApellidosNombre.text.toString()
+
+                val usuario = FirebaseAuth.getInstance().currentUser?.uid
+
+                usuarioId?.let { id ->
+                    // Incluir el ID de usuario en los datos a actualizar
+                    val nuevaTarjetaSIP = Tarjeta.TarjetaSIP(
+                        id = tarjetaSIP.id,
+                        idUsuario = tarjetaSIP.idUsuario,
+                        numeroSip = nuevoNumeroSip,
+                        digitoControl = nuevoDigitoControl,
+                        codigoIdentificacionTerritorial = nuevoCodigoIdentificacionTerritorial,
+                        datosIdentificacion = nuevosDatosIdentificacion,
+                        codigoSns = nuevoCodigoSns,
+                        fechaEmision = nuevaFechaEmision ?: Date(),
+                        fechaCaducidad = nuevaFechaCaducidad ?: Date(),
+                        telefonoUrgencias = nuevoTelefonoUrgencias,
+                        numeroSeguridadSocial = nuevoNumeroSeguridadSocial,
+                        centroMedico = nuevoCentroMedico,
+                        medicoAsignado = nuevoMedicoAsignado,
+                        enfermeraAsignada = nuevaEnfermeraAsignada,
+                        telefonosUrgenciasCitaPrevia = nuevosTelefonosUrgenciasCitaPrevia,
+                        apellidosNombre = nuevosApellidosNombre
+                    )
+
+                    // Actualizar la tarjeta DNI con los nuevos valores
+                    viewModel.modificarTarjetaSIP(nuevaTarjetaSIP)
+
+                    // Actualizar los campos de la interfaz de usuario con los nuevos valores
+                    cargarTarjetaSIPUsuario(nuevaTarjetaSIP)
+                }
+            }
+            .setNegativeButton("Cancelar") { dialogInterface, _ ->
+                dialogInterface.cancel()
+            }
+            .show()
+    }
+
+    private fun parseDate(dateString: String): Date? {
+        // Define the format of the date string
+        val sourceFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        // Parse the date string into a Date object
+        return sourceFormat.parse(dateString)
+    }
+
+
     private fun formatDate(date: Date): String {
         // Define el formato deseado para la fecha
         val targetFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -200,13 +263,13 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         return targetFormat.format(date)
     }
 
-    private fun mostrarDialogoEliminar(id: Int) {
+    private fun mostrarDialogoEliminar(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Eliminar Tarjeta")
         builder.setMessage("¿Estás seguro de que deseas eliminar la Tarjeta SIP?")
         builder.setPositiveButton("Sí") { dialog, _ ->
             // Lógica para eliminar la tarjeta
-            eliminarTarjeta(id)
+            eliminarTarjeta(tarjetaSIP)
             dialog.dismiss()
         }
         builder.setNegativeButton("No") { dialog, _ ->
@@ -216,8 +279,9 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         dialog.show()
     }
 
-    private fun eliminarTarjeta(id: Int) {
-        viewModel.eliminarTarjetaSIP(id)
+    private fun eliminarTarjeta(tarjetaSIP: Tarjeta.TarjetaSIP) {
+        viewModel.eliminarTarjetaSIP(tarjetaSIP)
+        Toast.makeText(requireContext(), "TarjetaSIPFragment DNI en metodo de eliminar.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

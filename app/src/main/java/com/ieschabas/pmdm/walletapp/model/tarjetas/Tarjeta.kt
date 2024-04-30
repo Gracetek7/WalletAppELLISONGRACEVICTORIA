@@ -15,7 +15,7 @@ sealed class Tarjeta {
         @SerializedName("id_usuario")
         val idUsuario: String,
         @SerializedName("numero_documento")
-        val numeroDocumento: String,
+        var numeroDocumento: String,
         @SerializedName("fecha_nacimiento")
         var fechaNacimiento: Date,
         @SerializedName("fecha_expedicion")
@@ -23,17 +23,17 @@ sealed class Tarjeta {
         @SerializedName("fecha_caducidad")
         var fechaCaducidad: Date,
         @SerializedName("nombre")
-        val nombre: String,
+        var nombre: String,
         @SerializedName("apellidos")
-        val apellidos: String,
+        var apellidos: String,
         @SerializedName("sexo")
-        val sexo: Sexo,
+        var sexo: Sexo,
         @SerializedName("nacionalidad")
-        val nacionalidad: String,
+        var nacionalidad: String,
         @SerializedName("lugar_nacimiento")
-        val lugarNacimiento: String,
+        var lugarNacimiento: String,
         @SerializedName("domicilio")
-        val domicilio: String,
+        var domicilio: String,
         @SerializedName("fotografia_url")
         val fotografiaUrl: String,
         @SerializedName("firma_url")
@@ -47,13 +47,13 @@ sealed class Tarjeta {
         @SerializedName("id_usuario")
         val idUsuario: String,
         @SerializedName("numero_sip")
-        val numeroSip: String,
+        var numeroSip: String,
         @SerializedName("digito_control")
-        val digitoControl: String,
+        var digitoControl: String,
         @SerializedName("codigo_identificacion_territorial")
-        val codigoIdentificacionTerritorial: String,
+        var codigoIdentificacionTerritorial: String,
         @SerializedName("datos_identificacion")
-        val datosIdentificacion: String,
+        var datosIdentificacion: String,
         @SerializedName("codigo_sns")
         val codigoSns: String,
         @SerializedName("fecha_emision")

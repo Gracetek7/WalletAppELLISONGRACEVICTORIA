@@ -1,11 +1,18 @@
 package com.ieschabas.pmdm.walletapp.ui.tarjetaDNI
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -27,10 +34,12 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
     constructor() : this(TarjetasRepository(TarjetasApi()))
 
     private lateinit var viewModel: TarjetaDNIViewModel
-    private lateinit var tarjetaDNI: Tarjeta.TarjetaDNI
+    private var tarjetaDNI: Tarjeta.TarjetaDNI? = null
 
     private var _binding: FragmentTarjetaDniBinding? = null
     private val binding get() = _binding!!
+
+    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,49 +62,33 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
             // Inicializar tarjetaDNI dentro de la coroutine
             tarjetaDNI = obtenerTarjetaDNI()
 
-            cargarTarjetaDNIUsuario(tarjetaDNI)
+            tarjetaDNI?.let { cargarTarjetaDNIUsuario(it) }
 
             // Configurar clic en la tarjeta para modificar
             binding.root.setOnClickListener {
-                //abrirFormularioModificacion(tarjeta)
+                mostrarDialogoModificar(tarjetaDNI!!)
             }
 
             // Configurar clic largo en la tarjeta para eliminar
             binding.root.setOnLongClickListener {
-                mostrarDialogoEliminar(id)
+                mostrarDialogoEliminar(tarjetaDNI!!)
                 true
             }
         }
     }
 
-    private suspend fun obtenerTarjetaDNI(): Tarjeta.TarjetaDNI {
-        val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
-
+    private suspend fun obtenerTarjetaDNI(): Tarjeta.TarjetaDNI? {
         // Verificar si el usuario está autenticado
         usuarioId?.let {
             try {
                 // Obtener la tarjeta DNI del repositorio
                 val tarjetasDNI = repository.obtenerTarjetaDNIUsuario(it)
                 // Si se obtiene al menos una tarjeta DNI, tomar la primera (asumiendo que solo hay una por usuario)
-                if (tarjetasDNI.isNotEmpty()) {
+                if (tarjetasDNI.isNotEmpty() && tarjetasDNI[0].numeroDocumento.isNotEmpty()) {
                     return tarjetasDNI[0]
                 } else {
-                    // Si no se encuentra ninguna tarjeta DNI, devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
-                    return Tarjeta.TarjetaDNI(
-                        idUsuario = it,
-                        numeroDocumento = "",
-                        fechaNacimiento = Date(),
-                        fechaExpedicion = Date(),
-                        fechaCaducidad = Date(),
-                        nombre = "",
-                        apellidos = "",
-                        sexo = Tarjeta.Sexo.MASCULINO, // O cualquier otro valor por defecto
-                        nacionalidad = "",
-                        lugarNacimiento = "",
-                        domicilio = "",
-                        fotografiaUrl = "",
-                        firmaUrl = ""
-                    )
+                    // Si no se encuentra ninguna tarjeta DNI válida, devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
+                    return null
                 }
             } catch (e: Exception) {
                 Log.e("TarjetaDNIFragment", "Error al obtener la tarjeta DNI del usuario: ${e.message}")
@@ -103,27 +96,11 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                 throw e
             }
         }
-
         // Si el usuario no está autenticado, puedes devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
-        return Tarjeta.TarjetaDNI(
-            idUsuario = "",
-            numeroDocumento = "",
-            fechaNacimiento = Date(),
-            fechaExpedicion = Date(),
-            fechaCaducidad = Date(),
-            nombre = "",
-            apellidos = "",
-            sexo = Tarjeta.Sexo.MASCULINO, // O cualquier otro valor por defecto
-            nacionalidad = "",
-            lugarNacimiento = "",
-            domicilio = "",
-            fotografiaUrl = "",
-            firmaUrl = ""
-        )
+        return null
     }
 
     private fun cargarTarjetaDNIUsuario(tarjetaDNI: Tarjeta.TarjetaDNI) {
-        val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let {
             Log.d("TarjetaDNIFragment", "ID de usuario: $it")
             viewModel.viewModelScope.launch {
@@ -165,36 +142,143 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                         getString(R.string.domicilio),
                         tarjetaDNI.domicilio
                     )
-                    Picasso.get()
-                        .load(tarjetaDNI.fotografiaUrl)
-                        //.placeholder(R.drawable.placeholder_image) // Recurso de imagen de marcador de posición mientras se carga la imagen
-                        //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
-                        .into(_binding?.ivFotografia)
+                    if (tarjetaDNI.fotografiaUrl.isNotEmpty()) {
+                        Picasso.get()
+                            .load(tarjetaDNI.fotografiaUrl)
+                            //.placeholder(R.drawable.placeholder_image) // Recurso de imagen de marcador de posición mientras se carga la imagen
+                            //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
+                            .into(_binding?.ivFotografia)
+                    } else {
+                        // Manejar el caso en el que la URL de la imagen esté vacía
+                    }
 
-                    Picasso.get()
-                        .load(tarjetaDNI.firmaUrl)
-                        //.placeholder(R.drawable.placeholder_image) // Recurso de imagen de marcador de posición mientras se carga la imagen
-                        //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
-                        .into(_binding?.ivFirma)
+                    if (tarjetaDNI.firmaUrl.isNotEmpty()) {
+                        Picasso.get()
+                            .load(tarjetaDNI.firmaUrl)
+                            //.placeholder(R.drawable.placeholder_image) // Recurso de imagen de marcador de posición mientras se carga la imagen
+                            //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
+                            .into(_binding?.ivFirma)
+                    } else {
+                        // Manejar el caso en el que la URL de la firma esté vacía
+                    }
                 }
             }
         }
     }
 
     private fun formatDate(date: Date): String {
-        // Define el formato deseado para la fecha
+        // Define the desired format for the date
         val targetFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        // Formatea la fecha en el formato deseado
+        // Format the date in the desired format
         return targetFormat.format(date)
     }
 
-    private fun mostrarDialogoEliminar(id: Int) {
+    private fun parseDate(dateString: String): Date? {
+        // Define the format of the date string
+        val sourceFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        // Parse the date string into a Date object
+        return sourceFormat.parse(dateString)
+    }
+
+    private fun mostrarDialogoModificar(tarjetaDNI: Tarjeta.TarjetaDNI) {
+        val builder = AlertDialog.Builder(requireContext())
+        val inflater = requireActivity().layoutInflater
+        val dialogLayout = inflater.inflate(R.layout.dialogo_crear_tarjeta_dni, null)
+
+        val etNumeroDocumento = dialogLayout.findViewById<EditText>(R.id.editTextNumeroDocumento)
+        val etNombre = dialogLayout.findViewById<EditText>(R.id.editTextNombre)
+        val etApellidos = dialogLayout.findViewById<EditText>(R.id.editTextApellidos)
+        val etNacionalidad = dialogLayout.findViewById<EditText>(R.id.editTextNacionalidad)
+        val etFechaNacimiento = dialogLayout.findViewById<EditText>(R.id.editTextFechaNacimiento)
+        val etFechaExpedicion = dialogLayout.findViewById<EditText>(R.id.editTextFechaExpedicion)
+        val etFechaCaducidad = dialogLayout.findViewById<EditText>(R.id.editTextFechaCaducidad)
+        val etLugarNacimiento = dialogLayout.findViewById<EditText>(R.id.editTextLugarNacimiento)
+        val etDomicilio = dialogLayout.findViewById<EditText>(R.id.editTextDomicilio)
+
+        // Establecer los valores actuales de la tarjeta DNI en los TextView
+        etNumeroDocumento.setText(tarjetaDNI.numeroDocumento)
+        etNombre.setText(tarjetaDNI.nombre)
+        etApellidos.setText(tarjetaDNI.apellidos)
+        etNacionalidad.setText(tarjetaDNI.nacionalidad)
+        etFechaNacimiento.setText(formatDate(tarjetaDNI.fechaNacimiento))
+        etFechaExpedicion.setText(formatDate(tarjetaDNI.fechaExpedicion))
+        etFechaCaducidad.setText(formatDate(tarjetaDNI.fechaCaducidad))
+        etLugarNacimiento.setText(tarjetaDNI.lugarNacimiento)
+        etDomicilio.setText(tarjetaDNI.domicilio)
+
+        builder.setView(dialogLayout)
+            .setPositiveButton("Guardar") { dialogInterface, _ ->
+                // Obtener los nuevos valores de los TextView
+                val nuevoNumeroDocumento = etNumeroDocumento.text.toString()
+                val nuevoNombre = etNombre.text.toString()
+                val nuevoApellidos = etApellidos.text.toString()
+                val nuevaNacionalidad = etNacionalidad.text.toString()
+
+                val nuevaFechaNacimiento =  parseDate(etFechaNacimiento.text.toString())
+                val nuevaFechaExpedicion = parseDate(etFechaExpedicion.text.toString())
+                val nuevaFechaCaducidad = parseDate(etFechaCaducidad.text.toString())
+                val nuevoLugarNacimiento = etLugarNacimiento.text.toString()
+                val nuevoDomicilio = etDomicilio.text.toString()
+
+                // Actualiza la tarjeta DNI con los nuevos valores
+                tarjetaDNI.numeroDocumento = nuevoNumeroDocumento
+                tarjetaDNI.nombre = nuevoNombre
+                tarjetaDNI.apellidos = nuevoApellidos
+                tarjetaDNI.nacionalidad = nuevaNacionalidad
+                if (nuevaFechaNacimiento != null) {
+                    tarjetaDNI.fechaNacimiento = nuevaFechaNacimiento
+                }
+                if (nuevaFechaExpedicion != null) {
+                    tarjetaDNI.fechaExpedicion = nuevaFechaExpedicion
+                }
+                if (nuevaFechaCaducidad != null) {
+                    tarjetaDNI.fechaCaducidad = nuevaFechaCaducidad
+                }
+                tarjetaDNI.lugarNacimiento = nuevoLugarNacimiento
+                tarjetaDNI.domicilio = nuevoDomicilio
+
+                val usuario = FirebaseAuth.getInstance().currentUser?.uid
+                usuarioId?.let { id ->
+                    // Incluir el ID de usuario en los datos a actualizar
+                    val updatedTarjetaDNI = tarjetaDNI.copy(
+                        idUsuario = usuario!!,
+                        numeroDocumento = nuevoNumeroDocumento,
+                        nombre = nuevoNombre,
+                        apellidos = nuevoApellidos,
+                        sexo = obtenerSexoDesdeUsuario(usuario),
+                        nacionalidad = nuevaNacionalidad,
+                        fechaNacimiento = nuevaFechaNacimiento!!,
+                        fechaExpedicion = nuevaFechaExpedicion!!,
+                        fechaCaducidad = nuevaFechaCaducidad!!,
+                        lugarNacimiento = nuevoLugarNacimiento,
+                        domicilio = nuevoDomicilio
+                    )
+
+                    // Actualizar la tarjeta DNI con los nuevos valores
+                    viewModel.modificarTarjetaDNI(updatedTarjetaDNI)
+
+                    // Actualizar los campos de la interfaz de usuario con los nuevos valores
+                    cargarTarjetaDNIUsuario(updatedTarjetaDNI)
+                }
+            }
+            .setNegativeButton("Cancelar") { dialogInterface, _ ->
+                dialogInterface.cancel()
+            }
+            .show()
+    }
+
+    private fun obtenerSexoDesdeUsuario(usuario: String): Tarjeta.Sexo {
+        return Tarjeta.Sexo.MASCULINO
+    }
+
+    // Diálogo para eliminar la tarjeta DNI
+    private fun mostrarDialogoEliminar(tarjetaDNI: Tarjeta.TarjetaDNI) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Eliminar Tarjeta")
         builder.setMessage("¿Estás seguro de que deseas eliminar la Tarjeta DNI?")
         builder.setPositiveButton("Sí") { dialog, _ ->
             // Lógica para eliminar la tarjeta
-            eliminarTarjeta(id)
+            eliminarTarjeta(tarjetaDNI)
             dialog.dismiss()
         }
         builder.setNegativeButton("No") { dialog, _ ->
@@ -204,8 +288,26 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         dialog.show()
     }
 
-    private fun eliminarTarjeta(id: Int) {
-        viewModel.eliminarTarjetaDNI(id)
+    private fun eliminarTarjeta(tarjetaDNI: Tarjeta.TarjetaDNI) {
+        // Elimina la tarjeta DNI
+        viewModel.eliminarTarjetaDNI(tarjetaDNI)
+        Toast.makeText(requireContext(), "Tarjeta DNI Eliminada con éxito", Toast.LENGTH_SHORT).show()
+        limpiarCampos()
+    }
+
+    private fun limpiarCampos() {
+        _binding?.tvNumeroDocumento?.text = ""
+        _binding?.tvNombre?.text = ""
+        _binding?.tvApellidos?.text = ""
+        _binding?.tvSexo?.text = ""
+        _binding?.tvNacionalidad?.text = ""
+        _binding?.tvFechaNacimiento?.text = ""
+        _binding?.tvFechaExpedicion?.text = ""
+        _binding?.tvFechaCaducidad?.text = ""
+        _binding?.tvLugarNacimiento?.text = ""
+        _binding?.tvDomicilio?.text = ""
+        _binding?.ivFotografia?.setImageDrawable(null)
+        _binding?.ivFirma?.setImageDrawable(null)
     }
 
     override fun onDestroyView() {

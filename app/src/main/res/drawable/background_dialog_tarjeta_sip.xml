@@ -2,7 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <solid android:color="#B0D7DC" />
-
-<!--    <corners android:radius="20dp" /> &lt;!&ndash; Radio de las esquinas &ndash;&gt;-->
+    <!-- Radio de las esquinas -->
 
 </shape>

@@ -2,6 +2,7 @@ package com.ieschabas.pmdm.walletapp.ui.tarjetaSIP
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,7 +21,6 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
 
     private val _usuarioActual = MutableLiveData<Usuario?>()
     val usuarioActual: MutableLiveData<Usuario?> get() = _usuarioActual
-
 
     // LiveData para manejar el estado de carga
     private val _isLoading = MutableLiveData<Boolean>()
@@ -49,38 +49,32 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
             }
         }
     }
-
-    // Método para modificar la tarjeta por el ID de la tarjeta
-    fun modificarTarjetaSIP(id: Int, tarjeta: Tarjeta.TarjetaDNI) {
+    fun modificarTarjetaSIP(tarjetaSIP: Tarjeta.TarjetaSIP) {
         viewModelScope.launch {
-            val tarjetaDNI = _tarjetasSIP.value
-            if (tarjetaDNI != null) {
-                val response = tarjetasRepository.modificarTarjetaDNI(id, tarjeta)
-                if (response?.isSuccessful == true) {
-                    // Tarjeta modificada exitosamente
-                } else {
-                    _error.postValue("Error al modificar las tarjeta SIP")
-                }
+            val response = tarjetaSIP.id.let { tarjetasRepository.modificarTarjetaSIP(tarjetaSIP) }
+            if (response?.isSuccessful == true) {
+                _tarjetasSIP.value = tarjetaSIP
+                Log.i("TarjetaSIPViewModel", "Tarjeta SIP modificada correctamente")
             } else {
-                _error.postValue("Error al encontrar la tarjeta SIP")
-                _isLoading.value = false
+                Log.e("TarjetaSIPViewModel", "Error al modificar la tarjeta SIP: ${response?.message()}")
             }
         }
     }
 
     // Método para eliminar la tarjeta por el ID de la tarjeta
-    fun eliminarTarjetaSIP(id: Int) {
+    fun eliminarTarjetaSIP(tarjetaSIP: Tarjeta.TarjetaSIP) {
         viewModelScope.launch {
-            val tarjetaDNI = _tarjetasSIP.value
-            if (tarjetaDNI != null) {
-                val response = tarjetasRepository.eliminarTarjetaDNI(id)
+            try {
+                val response = tarjetaSIP.id.let { tarjetasRepository.eliminarTarjetaSIP(it) }
                 if (response?.isSuccessful == true) {
                     // Tarjeta eliminada exitosamente
+                    // Aquí también puedes actualizar la lista de tarjetas DNI si lo deseas
+                    //_tarjetasSIP.value = tarjetaSIP
                 } else {
-                    _error.postValue("Error al eliminar la tarjeta SIP")             }
-            } else {
-                _error.postValue("Error al encontrar la tarjeta SIP")
-                _isLoading.value = false
+                    Log.e("TarjetaSIPViewModel", "error al eliminar la tarjeta sip")
+                }
+            } catch (e: Exception) {
+                Log.e("TarjetaSIPViewModel", "Error al eliminar la tarjeta sip: ${e.message}")
             }
         }
     }

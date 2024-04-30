@@ -6,11 +6,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import kotlinx.coroutines.launch
 
-class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModel() {
+class TarjetaDNIViewModel(
+    private val context: Context,
+    private val tarjetasRepository: TarjetasRepository,
+) : ViewModel() {
+
+    private val usuarioId: String = ""
 
     // LiveData para almacenar la lista de tarjetas DNI
     private val _tarjetasDNI = MutableLiveData<List<Tarjeta.TarjetaDNI?>>()
@@ -28,6 +34,11 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
 
     private var currentId: Int? = null
 
+    init {
+        // Cargar las tarjetas DNI del usuario cuando se crea la instancia de la vista
+        cargarTarjetaDNIUsuario(usuarioId)
+    }
+
     fun cargarTarjetaDNIUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
@@ -35,6 +46,12 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
                 val tarjetas = tarjetasRepository.obtenerTarjetaDNIUsuario(idUsuario)
                 Log.d("TarjetaDNIViewModel", "Tarjetas DNI cargadas: $tarjetas")
                 _tarjetasDNI.postValue(tarjetas)
+
+                // Verificar si la lista de tarjetas DNI está vacía
+                if (tarjetas.isEmpty()) {
+                    // Manejar el caso en que el usuario no tenga tarjetas DNI cargadas
+                    _error.postValue("El usuario no tiene tarjetas DNI cargadas")
+                }
             } catch (e: Exception) {
                 Log.e(
                     "TarjetaDNIViewModel",
@@ -45,50 +62,48 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         }
     }
 
-    // Método para cargar las tarjetas DNI desde el repositorio de tarjetas
-    fun cargarTarjetaDNI(id: Int) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val tarjetasResponse = tarjetasRepository.getTarjetaDNI(id)
-            if (tarjetasResponse != null && tarjetasResponse.isSuccessful) {
-                _tarjetasDNI.postValue(listOf(tarjetasResponse.body()))
-            } else {
-                _error.postValue("Error al cargar las tarjetas DNI")
-            }
-            _isLoading.value = false
-        }
-    }
+//    // Método para cargar las tarjetas DNI desde el repositorio de tarjetas
+//    fun cargarTarjetaDNI(id: Int) {
+//        viewModelScope.launch {
+//            _isLoading.value = true
+//            val tarjetasResponse = tarjetasRepository.getTarjetaDNI(id)
+//            if (tarjetasResponse != null && tarjetasResponse.isSuccessful) {
+//                _tarjetasDNI.postValue(listOf(tarjetasResponse.body()))
+//            } else {
+//                _error.postValue("Error al cargar las tarjetas DNI")
+//            }
+//            _isLoading.value = false
+//        }
+//    }
 
     // Método para modificar la tarjeta por el ID de la tarjeta
-    fun modificarTarjetaDNI(id: Int, tarjeta: Tarjeta.TarjetaDNI) {
+    fun modificarTarjetaDNI(tarjetaDNI: Tarjeta.TarjetaDNI) {
         viewModelScope.launch {
-            val tarjetaDNI = tarjetasDNI.value?.find { it?.id == id }
-            if (tarjetaDNI != null) {
-                val response = tarjetasRepository.modificarTarjetaDNI(id, tarjeta)
-                if (response?.isSuccessful == true) {
-                    // Tarjeta modificada exitosamente
-                } else {
-                    Log.e("TarjetaDNIViewModel", "error al modificar la tarjeta dni")
-                }
+            val response = tarjetaDNI.id?.let { tarjetasRepository.modificarTarjetaDNI(it) }
+            if (response?.isSuccessful == true) {
+                // Tarjeta modificada exitosamente
+                // Actualizar la lista de tarjetas en el ViewModel
+                //val tarjetasDNI = tarjetasRepository.obtenerTarjetaDNIUsuario(idUsuario)
+                _tarjetasDNI.value = listOf(tarjetaDNI)
             } else {
-                // Manejar el caso en que no se encuentre la tarjeta
+                Log.e("TarjetaDNIViewModel", "error al modificar la tarjeta dni")
             }
         }
     }
 
     // Método para eliminar la tarjeta por el ID de la tarjeta
-    fun eliminarTarjetaDNI(id: Int) {
+    fun eliminarTarjetaDNI(tarjetaDNI: Tarjeta.TarjetaDNI) {
         viewModelScope.launch {
-            val tarjetaDNI = tarjetasDNI.value?.find { it?.id == id }
-            if (tarjetaDNI != null) {
-                val response = tarjetasRepository.eliminarTarjetaDNI(id)
+            try {
+                val response = tarjetaDNI.id?.let { tarjetasRepository.eliminarTarjetaDNI(it) }
                 if (response?.isSuccessful == true) {
                     // Tarjeta eliminada exitosamente
+                    // Aquí también puedes actualizar la lista de tarjetas DNI si lo deseas
                 } else {
                     Log.e("TarjetaDNIViewModel", "error al eliminar la tarjeta dni")
                 }
-            } else {
-                // Manejar el caso en que no se encuentre la tarjeta
+            } catch (e: Exception) {
+                Log.e("TarjetaDNIViewModel", "Error al eliminar la tarjeta dni: ${e.message}")
             }
         }
     }

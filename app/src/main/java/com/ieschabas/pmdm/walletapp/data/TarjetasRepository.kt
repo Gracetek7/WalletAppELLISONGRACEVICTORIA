@@ -87,7 +87,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         try {
             return tarjetaService.modificarUsuario(id, usuario)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en modificarUsuario: ${e.message}")
+            Log.e(errorApi, "Error en modificar Usuario: ${e.message}")
         }
         return null
     }
@@ -96,7 +96,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         try {
             return tarjetaService.eliminarUsuario(id)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en eliminarUsuario: ${e.message}")
+            Log.e(errorApi, "Error en eliminar Usuario: ${e.message}")
         }
         return null
     }
@@ -122,6 +122,9 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return tarjetas
     }
 
+
+    //metodo actualizar
+
     suspend fun getTarjetaDNI(id: Int): Response<Tarjeta.TarjetaDNI>? {
         try {
             return tarjetaService.getTarjetaDNI(id)
@@ -135,16 +138,16 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         try {
             return tarjetaService.insertarTarjetaDNI(tarjetaDNI)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en insertarTarjetaDNI: ${e.message}")
+            Log.e(errorApi, "Error en insertarTarjeta DNI: ${e.message}")
         }
         return null
     }
 
-    suspend fun modificarTarjetaDNI(id: Int, tarjetaDNI: Tarjeta.TarjetaDNI): Response<Void>? {
+    suspend fun modificarTarjetaDNI(id: Int): Response<Void>? {
         try {
-            return tarjetaService.modificarTarjetaDNI(id, tarjetaDNI)
+            return tarjetaService.modificarTarjetaDNI(id)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en modificarTarjetaDNI: ${e.message}")
+            Log.e(errorApi, "Error en modificarTarjeta DNI: ${e.message}")
         }
         return null
     }
@@ -153,7 +156,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         try {
             return tarjetaService.eliminarTarjetaDNI(id)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en eliminarTarjetaDNI: ${e.message}")
+            Log.e(errorApi, "Error al eliminar Tarjeta DNI: ${e.message}")
         }
         return null
     }
@@ -193,28 +196,29 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         try {
             return tarjetaService.insertarTarjetaSIP(tarjetaSIP)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en insertarTarjetaSIP: ${e.message}")
+            Log.e(errorApi, "Error al insertar Tarjeta SIP: ${e.message}")
         }
         return null
     }
 
-    suspend fun modificarTarjetaSIP(id: String, tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>? {
+    suspend fun modificarTarjetaSIP(tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>? {
         try {
-            return tarjetaService.modificarTarjetaSIP(id, tarjetaSIP)
+            return tarjetaService.modificarTarjetaSIP(tarjetaSIP)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en modificarTarjetaSIP: ${e.message}")
+            Log.e(errorApi, "Error al modificar Tarjeta SIP: ${e.message}")
         }
         return null
     }
 
-    suspend fun eliminarTarjetaSIP(id: String): Response<Void>? {
+    suspend fun eliminarTarjetaSIP(id: Int): Response<Void>? {
         try {
             return tarjetaService.eliminarTarjetaSIP(id)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error en eliminarTarjetaSIP: ${e.message}")
+            Log.e(errorApi, "Error al eliminar Tarjeta SIP: ${e.message}")
         }
         return null
     }
+
 
     suspend fun getPermisoCirculacion(id: String): Response<Tarjeta.TarjetaPermisoCirculacion>? {
         try {

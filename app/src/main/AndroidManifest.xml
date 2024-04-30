@@ -3,9 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ieschabas.pmdm.walletapp">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.MANAGE_MEDIA"
+        tools:ignore="ProtectedPermissions" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,6 +27,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WalletApp"
         tools:targetApi="31"
+        android:targetSdkVersion="34"
+        android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true">
 
         <activity

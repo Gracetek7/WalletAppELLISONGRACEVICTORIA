@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">WalletApp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -34,17 +34,17 @@
 
     <string name="numero_sip">NUMERO: </string>
     <string name="digito_control">DIGITO CONTROL: </string>
-    <string name="codigo_identificacion_territorial">COD. IDENTIFICACION TERRITORIAL: </string>
+    <string name="codigo_identificacion_territorial">COD. ID. TERRITORIAL: </string>
     <string name="datos_identificacion">DATOS IDENTIFICACION: </string>
     <string name="codigo_sns">CODIGO SNS: </string>
     <string name="fecha_emision">FECHA EMISION: </string>
     <string name="fecha_caducidad">FECHA CADUCIDAD: </string>
     <string name="telefono_urgencias">TELEFONO URGENCIAS: </string>
-    <string name="numero_seguridad_social">NUMERO SEGURIDAD SOCIAL: </string>
+    <string name="numero_seguridad_social">NUMERO SS: </string>
     <string name="centro_medico">CENTRO MEDICO: </string>
     <string name="medico_asignado">MEDICO ASIGNADO: </string>
     <string name="enfermera_asignada">ENFERMERA ASIGNADA:</string>
-    <string name="telefonos_urgencias_cita_previa">TELEF. URGENCIAS/CITA PREVIA: </string>
+    <string name="telefonos_urgencias_cita_previa">TELEF.URGENCIAS/CITA: </string>
     <string name="apellidos_nombre">APELLIDOS Y NOMBRE: </string>
     <string name="fab_description">Descripcion\n</string>
     <string name="agregar_tarjeta">Agregar Tarjeta</string>
@@ -61,6 +61,7 @@
     <string name="tarjeta_dni">DNI</string>
     <string name="tarjeta_sip">SIP</string>
     <string name="tarjeta_permiso_circulacion">Permiso Circulacion</string>
+
 
     <!-- Campos asociados a la tarjeta DNI del usuario -->
     <string name="dni_template">%2$s</string>
@@ -96,6 +97,8 @@
     <string name="domicilioHint">Domicilio</string>
     <string name="cancelar_crear_tarjeta_dni">Cancelar</string>
     <string name="aceptar_crear_tarjeta_dni">Crear</string>
+    <string name="no_hay_tarjeta_dni_creada">No hay tarjeta DNI creada</string>
+    <string name="nombreHint">Nombre</string>
 
 
     <string-array name="sexo_options">

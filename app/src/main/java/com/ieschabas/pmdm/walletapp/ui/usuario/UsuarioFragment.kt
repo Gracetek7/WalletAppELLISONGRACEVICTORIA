@@ -15,11 +15,24 @@ import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
+import androidx.activity.result.ActivityResult
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.ieschabas.pmdm.walletapp.R
 import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
+import java.io.File
+import java.io.FileOutputStream
 
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetasAdapter.OnTarjetaClickListener {
     constructor() : this(TarjetasRepository(TarjetasApi()))

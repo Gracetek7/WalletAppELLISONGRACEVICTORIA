@@ -46,7 +46,7 @@ interface TarjetasService {
     suspend fun insertarTarjetaDNI(@Body tarjetaDNI: Tarjeta.TarjetaDNI): Response<Void>
 
     @PUT("PUTtarjetaDNI/{id}")
-    suspend fun modificarTarjetaDNI(@Path("id") id: Int, @Body tarjetaDNI: Tarjeta.TarjetaDNI): Response<Void>
+    suspend fun modificarTarjetaDNI(@Path("id") id: Int): Response<Void>
 
     @DELETE("DELETEtarjetaDNI/{id}")
     suspend fun eliminarTarjetaDNI(@Path("id") id: Int): Response<Void>
@@ -58,11 +58,11 @@ interface TarjetasService {
     @POST("POSTtarjetaSIP")
     suspend fun insertarTarjetaSIP(@Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
 
-    @PUT("PUTtarjetaSIP/{id}")
-    suspend fun modificarTarjetaSIP(@Path("id") id: String, @Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
+    @PUT("PUTtarjetaSIP")
+    suspend fun modificarTarjetaSIP(@Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
 
     @DELETE("DELETEtarjetaSIP/{id}")
-    suspend fun eliminarTarjetaSIP(@Path("id") id: String): Response<Void>
+    suspend fun eliminarTarjetaSIP(@Path("id") id: Int): Response<Void>
 
     // Tarjeta Permiso de Circulación
     @GET("GETpermisoCirculacion/{id}")

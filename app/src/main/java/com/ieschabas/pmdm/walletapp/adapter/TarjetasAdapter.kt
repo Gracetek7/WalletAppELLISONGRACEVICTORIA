@@ -34,6 +34,7 @@ class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerVi
         when (holder.itemViewType) {
             TIPO_TARJETA_DNI -> {
                 (holder as TarjetaDNViewHolder).bind(tarjeta as Tarjeta.TarjetaDNI, context)
+
             }
             TIPO_TARJETA_SIP -> {
                 (holder as TarjetaSIPViewHolder).bind(tarjeta as Tarjeta.TarjetaSIP)
