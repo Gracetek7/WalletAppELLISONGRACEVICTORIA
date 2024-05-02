@@ -58,8 +58,8 @@ interface TarjetasService {
     @POST("POSTtarjetaSIP")
     suspend fun insertarTarjetaSIP(@Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
 
-    @PUT("PUTtarjetaSIP")
-    suspend fun modificarTarjetaSIP(@Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
+    @PUT("PUTtarjetaSIP/{id}")
+    suspend fun modificarTarjetaSIP(@Path("id") id: Int, @Body tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>
 
     @DELETE("DELETEtarjetaSIP/{id}")
     suspend fun eliminarTarjetaSIP(@Path("id") id: Int): Response<Void>

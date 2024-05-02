@@ -201,9 +201,9 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    suspend fun modificarTarjetaSIP(tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>? {
+    suspend fun modificarTarjetaSIP(id: Int,tarjetaSIP: Tarjeta.TarjetaSIP): Response<Void>? {
         try {
-            return tarjetaService.modificarTarjetaSIP(tarjetaSIP)
+            return tarjetaService.modificarTarjetaSIP(id,tarjetaSIP)
         } catch (e: Exception) {
             Log.e(errorApi, "Error al modificar Tarjeta SIP: ${e.message}")
         }

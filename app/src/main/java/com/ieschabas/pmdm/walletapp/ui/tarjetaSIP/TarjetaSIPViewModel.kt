@@ -49,9 +49,11 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
             }
         }
     }
-    fun modificarTarjetaSIP(tarjetaSIP: Tarjeta.TarjetaSIP) {
+
+    fun modificarTarjetaSIP(id: Int, tarjetaSIP: Tarjeta.TarjetaSIP) {
         viewModelScope.launch {
-            val response = tarjetaSIP.id.let { tarjetasRepository.modificarTarjetaSIP(tarjetaSIP) }
+            Log.d("TarjetaSIPViewModel", "Tarjeta SIP id: $id")
+            val response = tarjetaSIP.id.let { tarjetasRepository.modificarTarjetaSIP(id, tarjetaSIP) }
             if (response?.isSuccessful == true) {
                 _tarjetasSIP.value = tarjetaSIP
                 Log.i("TarjetaSIPViewModel", "Tarjeta SIP modificada correctamente")
