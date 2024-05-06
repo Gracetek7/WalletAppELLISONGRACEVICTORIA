@@ -1,38 +1,20 @@
 package com.ieschabas.pmdm.walletapp.ui.usuario
 
-import android.app.AlertDialog
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.firebase.auth.FirebaseAuth
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
-import androidx.activity.result.ActivityResult
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.ieschabas.pmdm.walletapp.R
 import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
-import java.io.File
-import java.io.FileOutputStream
 
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetasAdapter.OnTarjetaClickListener {
     constructor() : this(TarjetasRepository(TarjetasApi()))
@@ -40,26 +22,8 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
 
-    private var dialog: AlertDialog? = null
-
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
-
-    private inner class FragmentListener : UsuarioFragmentListener {
-        // Implementación del método para seleccionar una foto
-        override fun seleccionarFoto() {
-            // Llamar al método para seleccionar una foto en el Fragment
-            seleccionarImagen(true)
-        }
-
-        // Implementación del método para seleccionar una firma
-        override fun seleccionarFirma() {
-            // Llamar al método para seleccionar una firma en el Fragment
-            seleccionarImagen(false)
-        }
-    }
-
-    private val fragmentListener = FragmentListener()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,8 +50,6 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
         viewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
 
-        viewModel.setFragmentListener(fragmentListener)
-
         // Observar las tarjetas del usuario después de cargarlas
         viewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
             tarjetas?.let {
@@ -102,13 +64,13 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
-        cargarUsuarioActual() // Llamar al método para cargar el usuario actual y sus tarjetas asociadas
+        cargarUsuarioActual() // Carga el usuario actual y sus tarjetas asociadas
 
         btnAgregarTarjeta.setOnClickListener {
             Log.d("UsuarioFragment", "Botón Agregar Tarjeta clickeado")
             // Obtener el ID del usuario actual
             val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
-            usuarioId?.let { id ->
+            usuarioId?.let {
                 // Si se obtiene el ID del usuario, cargar sus tarjetas asociadas
                 viewModel.mostrarFormularioCrearTarjetas(usuarioId)
                 // No es necesario obtener el objeto Usuario aquí, ya que solo necesitas el ID para cargar las tarjetas.
@@ -137,64 +99,6 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let { id ->
             viewModel.cargarTarjetasUsuario(id)
-        }
-    }
-
-    // Método para mostrar la imagen seleccionada en un diálogo
-    private fun mostrarImagenesSeleccionadas(uriFoto: Uri?, uriFirma: Uri?) {
-
-        // Configura las imágenes seleccionadas en los ImageViews del diálogo
-        dialog?.let { dialog ->
-            uriFoto?.let {
-                dialog.findViewById<ImageView>(R.id.btnSeleccionarFoto)?.setImageURI(uriFoto)
-            }
-            uriFirma?.let {
-                dialog.findViewById<ImageView>(R.id.btnSeleccionarFirma)?.setImageURI(uriFirma)
-            }
-
-            // Muestra el diálogo si no está siendo mostrado actualmente
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-        }
-    }
-
-    private var isSelectingPhoto: Boolean = true
-
-
-    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
-        // Lógica para seleccionar la imagen
-        this.isSelectingPhoto = isSelectingPhoto
-        val imageType = if (isSelectingPhoto) "foto" else "firma"
-        Log.d("UsuarioFragment", "Iniciando selección de $imageType")
-        // Lanzar la actividad para seleccionar la imagen
-        imagePickerLauncher.launch("image/*")
-    }
-
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            // Check which type of image is being selected and handle accordingly
-            if (viewModel.fotoSeleccionadaUrl.value == null) {
-                viewModel.handleSeleccionFotoResult(uri)
-            } else if (viewModel.firmaSeleccionadaUrl.value == null) {
-                viewModel.handleSeleccionFirmaResult(uri)
-            } else {
-                Log.d("UsuarioFragment", "Both images already selected")
-            }
-
-            // Check if both images have been selected
-            if (viewModel.fotoSeleccionadaUrl.value != null && viewModel.firmaSeleccionadaUrl.value != null) {
-                // If both images have been selected, show them
-                viewModel.fotoSeleccionadaUrl.value?.let { uriFoto ->
-                    viewModel.firmaSeleccionadaUrl.value?.let { uriFirma ->
-                        mostrarImagenesSeleccionadas(uriFoto, uriFirma)
-                    }
-                }
-            }
-        } else {
-            Log.d("UsuarioFragment", "Error: Se ha cancelado la selección de la imagen")
         }
     }
 

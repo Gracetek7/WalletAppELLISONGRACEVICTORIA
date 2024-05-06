@@ -27,7 +27,6 @@ import java.util.Date
 import java.util.Locale
 
 class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment() {
-
     constructor() : this(TarjetasRepository(TarjetasApi()))
 
     private lateinit var viewModel: TarjetaSIPViewModel
@@ -36,7 +35,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
     private var _binding: FragmentTarjetaSipBinding? = null
     private val binding get() = _binding!!
 
-    val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
+    private val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,6 +70,19 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
                 mostrarDialogoEliminar(tarjetaSIP!!)
                 true
             }
+            // Boton modificar tarjeta SIP
+            binding.modificarButton.setOnClickListener {
+                tarjetaSIP?.let {
+                    mostrarDialogoModificar(it)
+                }
+            }
+
+            // Boton eliminar tarjeta SIP
+            binding.eliminarButton.setOnClickListener {
+                tarjetaSIP?.let {
+                    mostrarDialogoEliminar(it)
+                }
+            }
         }
     }
 
@@ -96,7 +108,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         // Si el usuario no está autenticado, puedes devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
         return null
     }
-
 
     private fun cargarTarjetaSIPUsuario(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
@@ -185,20 +196,15 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         val etApellidosNombre = dialogLayout.findViewById<EditText>(R.id.tvApellidosNombreUsuario)
 
         val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val formatoInput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formatoInput = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         etFechaEmision.setOnClickListener {
-            mostrarDatePickerDialog(etFechaEmision, formatoMostrar) { fechaSeleccionada ->
-                fechaEmisionSeleccionada = fechaSeleccionada
-            }
+            mostrarDatePickerDialog(etFechaEmision, formatoMostrar, "emision")
         }
 
         etFechaCaducidad.setOnClickListener {
-            mostrarDatePickerDialog(etFechaCaducidad, formatoMostrar) { fechaSeleccionada ->
-                fechaCaducidadSeleccionada = fechaSeleccionada
-            }
+            mostrarDatePickerDialog(etFechaCaducidad, formatoMostrar, "caducidad")
         }
-
         // Establecer los valores actuales de la tarjeta SIP en los EditText
         etNumeroSip.setText(tarjetaSIP.numeroSip)
         etDigitoControl.setText(tarjetaSIP.digitoControl)
@@ -216,15 +222,27 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         etApellidosNombre.setText(tarjetaSIP.apellidosNombre)
 
         builder.setView(dialogLayout)
-            .setPositiveButton("Guardar") { dialogInterface, _ ->
+            .setPositiveButton("Guardar") { _, _ ->
                 // Obtener los nuevos valores de los EditText
                 val nuevoNumeroSip = etNumeroSip.text.toString()
                 val nuevoDigitoControl = etDigitoControl.text.toString()
                 val nuevoCodigoIdentificacionTerritorial = etCodigoIdentificacionTerritorial.text.toString()
                 val nuevosDatosIdentificacion = etDatosIdentificacion.text.toString()
                 val nuevoCodigoSns = etCodigoSns.text.toString()
-                val nuevaFechaEmision = fechaEmisionSeleccionada
-                val nuevaFechaCaducidad = fechaCaducidadSeleccionada
+
+                val fechaEmisionStr = etFechaEmision.text.toString()
+                val fechaCaducidadStr = etFechaCaducidad.text.toString()
+
+                val fechaEmisionDate = formatoMostrar.parse(fechaEmisionStr)
+                val fechaEmisionFormatted = formatoMostrar.format(fechaEmisionDate!!)
+
+                val fechaCaducidadDate = formatoMostrar.parse(fechaCaducidadStr)
+                val fechaCaducidadFormatted = formatoMostrar.format(fechaCaducidadDate!!)
+
+                // Convert the formatted date strings back to Date objects
+                val fechaEmisionDate2 = formatoMostrar.parse(fechaEmisionFormatted)
+                val fechaCaducidadDate2 = formatoMostrar.parse(fechaCaducidadFormatted)
+
                 val nuevoTelefonoUrgencias = etTelefonoUrgencias.text.toString()
                 val nuevoNumeroSeguridadSocial = etNumeroSeguridadSocial.text.toString()
                 val nuevoCentroMedico = etCentroMedico.text.toString()
@@ -235,35 +253,40 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
 
                 tarjetaSIP.id.let { id ->
                     try {
-                        // Convertir las fechas al formato 'yyyy-MM-dd'
-                        val fechaEmision: Date? = formatoMostrar.parse(nuevaFechaEmision.toString())
-                        val fechaCaducidad: Date? = formatoMostrar.parse(nuevaFechaCaducidad.toString())
+                        val fechaEmision = formatoInput.parse(fechaEmisionStr)
+                        val fechaCaducidad = formatoInput.parse(fechaCaducidadStr)
 
-                        // Incluir el ID de usuario en los datos a actualizar
-                        val nuevaTarjetaSIP = Tarjeta.TarjetaSIP(
-                            id = tarjetaSIP.id,
-                            idUsuario = tarjetaSIP.idUsuario,
-                            numeroSip = nuevoNumeroSip,
-                            digitoControl = nuevoDigitoControl,
-                            codigoIdentificacionTerritorial = nuevoCodigoIdentificacionTerritorial,
-                            datosIdentificacion = nuevosDatosIdentificacion,
-                            codigoSns = nuevoCodigoSns,
-                            fechaEmision = fechaEmision!!,
-                            fechaCaducidad = fechaCaducidad!!,
-                            telefonoUrgencias = nuevoTelefonoUrgencias,
-                            numeroSeguridadSocial = nuevoNumeroSeguridadSocial,
-                            centroMedico = nuevoCentroMedico,
-                            medicoAsignado = nuevoMedicoAsignado,
-                            enfermeraAsignada = nuevaEnfermeraAsignada,
-                            telefonosUrgenciasCitaPrevia = nuevosTelefonosUrgenciasCitaPrevia,
-                            apellidosNombre = nuevosApellidosNombre
-                        )
+                        // Verifica si el resultado no es nulo
+                        if (fechaEmision != null && fechaCaducidad != null) {
+                            // Incluir el ID de usuario en los datos a actualizar
+                            val nuevaTarjetaSIP = Tarjeta.TarjetaSIP(
+                                id = tarjetaSIP.id,
+                                idUsuario = tarjetaSIP.idUsuario,
+                                numeroSip = nuevoNumeroSip,
+                                digitoControl = nuevoDigitoControl,
+                                codigoIdentificacionTerritorial = nuevoCodigoIdentificacionTerritorial,
+                                datosIdentificacion = nuevosDatosIdentificacion,
+                                codigoSns = nuevoCodigoSns,
+                                fechaEmision = fechaEmisionDate2!!,
+                                fechaCaducidad = fechaCaducidadDate2!!,
+                                telefonoUrgencias = nuevoTelefonoUrgencias,
+                                numeroSeguridadSocial = nuevoNumeroSeguridadSocial,
+                                centroMedico = nuevoCentroMedico,
+                                medicoAsignado = nuevoMedicoAsignado,
+                                enfermeraAsignada = nuevaEnfermeraAsignada,
+                                telefonosUrgenciasCitaPrevia = nuevosTelefonosUrgenciasCitaPrevia,
+                                apellidosNombre = nuevosApellidosNombre
+                            )
 
-                        // Actualizar la tarjeta DNI con los nuevos valores
-                        viewModel.modificarTarjetaSIP(id, nuevaTarjetaSIP)
+                            // Actualizar la tarjeta DNI con los nuevos valores
+                            viewModel.modificarTarjetaSIP(id, nuevaTarjetaSIP)
 
-                        // Actualizar los campos de la interfaz de usuario con los nuevos valores
-                        cargarTarjetaSIPUsuario(nuevaTarjetaSIP)
+                            // Actualizar los campos de la interfaz de usuario con los nuevos valores
+                            cargarTarjetaSIPUsuario(nuevaTarjetaSIP)
+                        } else {
+                            // Manejar el caso en que no se pudo parsear una o ambas fechas
+                            Log.e("Error", "No se pudo parsear una o ambas fechas")
+                        }
                     } catch (e: ParseException) {
                         Log.e("Error", "Error al parsear la fecha", e)
                         // Manejar el error de análisis de fecha aquí
@@ -276,6 +299,13 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
             .show()
     }
 
+    private fun formatDateForServer(dateStr: String): String {
+        val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = inputFormat.parse(dateStr)
+        return outputFormat.format(date)
+    }
+
     // Boton navegar hacia
     //https://www.san.gva.es/es/web/tarjeta-sanitaria
     private fun formatDate(date: Date): String {
@@ -285,19 +315,22 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         return targetFormat.format(date)
     }
 
-    private fun mostrarDatePickerDialog(editText: EditText, formato: SimpleDateFormat, onDateSelected: (Date) -> Unit) {
+    private fun mostrarDatePickerDialog(editText: EditText, formato: SimpleDateFormat, tipoFecha: String) {
         val calendar = Calendar.getInstance()
         val datePickerDialog = context?.let {
             DatePickerDialog(
                 it,
                 { _, year, month, dayOfMonth ->
                     calendar.set(year, month, dayOfMonth)
-                    val fechaSeleccionada = calendar.time
-                    val fechaFormateada = formato.format(fechaSeleccionada)
-                    editText.setText(fechaFormateada)
+                    val fechaFormateada = calendar.time
+                    editText.setText(formato.format(fechaFormateada))
+                    // Actualizar la variable correspondiente según el tipo de fecha
+                    if (tipoFecha == "emision") {
+                        fechaEmisionSeleccionada = fechaFormateada
 
-                    // Llamar al callback con la fecha seleccionada
-                    onDateSelected(fechaSeleccionada)
+                    } else if (tipoFecha == "caducidad") {
+                        fechaCaducidadSeleccionada = fechaFormateada
+                    }
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -306,6 +339,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
         datePickerDialog!!.show()
     }
+
     private fun mostrarDialogoEliminar(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Eliminar Tarjeta")

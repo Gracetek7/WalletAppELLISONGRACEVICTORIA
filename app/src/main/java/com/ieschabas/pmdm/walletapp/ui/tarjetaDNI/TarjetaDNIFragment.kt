@@ -1,18 +1,16 @@
 package com.ieschabas.pmdm.walletapp.ui.tarjetaDNI
 
 import android.app.AlertDialog
-import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +39,23 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
 
     val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
 
+    private var dialog: AlertDialog? = null
+
+    private inner class FragmentListener : TarjetaDNIFragmentListener {
+        // Implementación del método para seleccionar una foto
+        override fun seleccionarFoto() {
+            // Llamar al método para seleccionar una foto en el Fragment
+            seleccionarImagen(true)
+        }
+        
+        // Implementación del método para seleccionar una firma
+        override fun seleccionarFirma() {
+            // Llamar al método para seleccionar una firma en el Fragment
+            seleccionarImagen(false)
+        }
+    }
+    private val fragmentListener = FragmentListener()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,6 +79,9 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
 
             tarjetaDNI?.let { cargarTarjetaDNIUsuario(it) }
 
+            viewModel.setFragmentListener(fragmentListener)
+
+
             // Configurar clic en la tarjeta para modificar
             binding.root.setOnClickListener {
                 mostrarDialogoModificar(tarjetaDNI!!)
@@ -73,6 +91,19 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
             binding.root.setOnLongClickListener {
                 mostrarDialogoEliminar(tarjetaDNI!!)
                 true
+            }
+            // Boton modificar tarjeta DNI
+            binding.modificarButton.setOnClickListener {
+                tarjetaDNI?.let {
+                    mostrarDialogoModificar(it)
+                }
+            }
+
+            // Boton eliminar tarjeta DNI
+            binding.eliminarButton.setOnClickListener {
+                tarjetaDNI?.let {
+                    mostrarDialogoEliminar(it)
+                }
             }
         }
     }
@@ -286,6 +317,64 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         }
         val dialog = builder.create()
         dialog.show()
+    }
+
+    // Método para mostrar la imagen seleccionada en un diálogo
+    private fun mostrarImagenesSeleccionadas(uriFoto: Uri?, uriFirma: Uri?) {
+
+        // Configura las imágenes seleccionadas en los ImageViews del diálogo
+        dialog?.let { dialog ->
+            uriFoto?.let {
+                dialog.findViewById<ImageView>(R.id.btnSeleccionarFoto)?.setImageURI(uriFoto)
+            }
+            uriFirma?.let {
+                dialog.findViewById<ImageView>(R.id.btnSeleccionarFirma)?.setImageURI(uriFirma)
+            }
+
+            // Muestra el diálogo si no está siendo mostrado actualmente
+            if (!dialog.isShowing) {
+                dialog.show()
+            }
+        }
+    }
+
+    private var isSelectingPhoto: Boolean = true
+
+
+    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
+        // Lógica para seleccionar la imagen
+        this.isSelectingPhoto = isSelectingPhoto
+        val imageType = if (isSelectingPhoto) "foto" else "firma"
+        Log.d("UsuarioFragment", "Iniciando selección de $imageType")
+        // Lanzar la actividad para seleccionar la imagen
+        imagePickerLauncher.launch("image/*")
+    }
+
+    private val imagePickerLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            // Check which type of image is being selected and handle accordingly
+            if (viewModel.fotoSeleccionadaUrl.value == null) {
+                viewModel.handleSeleccionFotoResult(uri)
+            } else if (viewModel.firmaSeleccionadaUrl.value == null) {
+                viewModel.handleSeleccionFirmaResult(uri)
+            } else {
+                Log.d("UsuarioFragment", "Both images already selected")
+            }
+
+            // Check if both images have been selected
+            if (viewModel.fotoSeleccionadaUrl.value != null && viewModel.firmaSeleccionadaUrl.value != null) {
+                // If both images have been selected, show them
+                viewModel.fotoSeleccionadaUrl.value?.let { uriFoto ->
+                    viewModel.firmaSeleccionadaUrl.value?.let { uriFirma ->
+                        mostrarImagenesSeleccionadas(uriFoto, uriFirma)
+                    }
+                }
+            }
+        } else {
+            Log.d("UsuarioFragment", "Error: Se ha cancelado la selección de la imagen")
+        }
     }
 
     private fun eliminarTarjeta(tarjetaDNI: Tarjeta.TarjetaDNI) {
