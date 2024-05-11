@@ -18,10 +18,11 @@
             android:id="@+id/tarjetasTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="20dp"
             android:text="@string/tarjetas"
             android:textAlignment="center"
-            android:textSize="20sp"/>
+            android:textSize="30sp"
+            android:textStyle="bold"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -32,9 +33,9 @@
         <Button
             android:id="@+id/btnAgregarTarjeta"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="62dp"
             android:layout_gravity="end"
-            android:text="@string/agregar_tarjeta"/>
+            android:text="@string/agregar_tarjeta" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

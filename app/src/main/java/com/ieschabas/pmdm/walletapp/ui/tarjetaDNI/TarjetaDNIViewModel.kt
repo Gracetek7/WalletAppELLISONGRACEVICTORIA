@@ -23,14 +23,17 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+// Listener Fragment para escuchar los clicks del Fragment en imágenes a seleccionar
 interface TarjetaDNIFragmentListener {
+
+    // Método para seleccionar las imágenes
     fun seleccionarFoto()
     fun seleccionarFirma()
 }
 
 class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepository: TarjetasRepository, ) : ViewModel() {
 
-
+    // Fragment Listener para seleccionar las imágenes
     private var fragmentListener: TarjetaDNIFragmentListener? = null
 
     private val _tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
@@ -149,7 +152,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
     }
 
     // Dialógo para crear nueva Tarjeta DNI
-    fun mostrarDialogoCrearTarjetaDNI(usuario: String) {
+    fun mostrarDialogoCrearTarjetaDNI(usuario: String, tarjetaDNI: Tarjeta.TarjetaDNI? = null) {
         Log.d("UsuarioViewModel", "en el metodo de mostrar Dialogo crear tarjeta DNI")
 
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialogo_crear_tarjeta_dni, null)
@@ -309,7 +312,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
             _error.postValue("Error al parsear la fecha: ${e.message}" +fechaNacimiento+ fechaExpedicion)
         }
     }
-
+    // Método para insertar la nueva tarjeta DNI del usuario en el repositorio
     suspend fun crearTarjetaDNIDesdeObjeto(nuevaTarjeta: Tarjeta.TarjetaDNI) {
         _isLoading.postValue(true)
         try {
@@ -327,6 +330,8 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
             _isLoading.postValue(false)
         }
     }
+
+    // Carga la lista de tarjetas del usuario asociado
     fun cargarTarjetasUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
@@ -341,6 +346,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         }
     }
 
+    // Muestra un diálogo para seleccionar las fechas
     private fun mostrarDatePickerDialog(editText: EditText, formato: SimpleDateFormat) {
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
@@ -357,10 +363,12 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         datePickerDialog.show()
     }
 
+    // Método para obtener el sexo del usuario
     private fun obtenerSexoDesdeUsuario(usuario: String): Tarjeta.Sexo {
         return Tarjeta.Sexo.MASCULINO
     }
 
+    // Calcula la fecha de caducidad de tarjeta DNI
     private fun calcularFechaCaducidad(fechaExpedicion: Date): Date {
         val calendar = Calendar.getInstance()
         calendar.time = fechaExpedicion

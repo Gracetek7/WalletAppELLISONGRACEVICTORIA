@@ -3,16 +3,25 @@ package com.ieschabas.pmdm.walletapp.ui.usuario
 import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.privacysandbox.tools.core.model.Method
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.model.Usuario
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIViewModel
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewModel
 import kotlinx.coroutines.launch
+import okhttp3.Request
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class UsuarioViewModel(private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModel() {
 
@@ -73,7 +82,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
 
     fun mostrarFormularioCrearTarjetas(usuario: String) {
         Log.d("UsuarioViewModel", "UsuarioViewModel, en el metodo de mostrar formulario crear tarjetas")
-        val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación")
+        val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación","Otro")
 
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Crear Tarjeta")
@@ -121,6 +130,46 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             _error.postValue("Error al eliminar el usuario: ${e.message}")
         } finally {
             _isLoading.value = false
+        }
+    }
+
+    fun enviarNotificacionAlServidor() {
+        // Obtener el token del dispositivo actual
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+
+                // Crear el cuerpo de la notificación
+                val notification = JSONObject().apply {
+                    put("to", token)
+                    put("data", JSONObject().put("message", "Se ha iniciado la sesión"))
+                }
+
+                // Configurar la conexión HTTP
+                val url = URL("https://fcm.googleapis.com/fcm/send")
+                (url.openConnection() as? HttpURLConnection)?.run {
+                    requestMethod = "POST"
+                    setRequestProperty("Content-Type", "application/json")
+                    setRequestProperty("Authorization", "key=YOUR_SERVER_KEY")
+
+                    doOutput = true
+                    outputStream?.use { os ->
+                        os.write(notification.toString().toByteArray())
+                        os.flush()
+                    }
+
+                    // Lee la respuesta del servidor (es opcional)
+                    inputStream?.use { response ->
+                        // Lee la respuesta del servidor
+                        val responseData = response.bufferedReader().use { it.readText() }
+                        Log.d("UsuarioFragment", "Respuesta del servidor: $responseData")
+                    }
+
+                    disconnect()
+                } ?: Log.e("UsuarioFragment", "No se pudo abrir la conexión HTTP")
+            } else {
+                Log.e("UsuarioFragment", "Error al obtener el token de FCM: ${task.exception}")
+            }
         }
     }
 

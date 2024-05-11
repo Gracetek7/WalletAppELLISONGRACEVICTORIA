@@ -9,6 +9,7 @@ import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNViewHolder
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewHolder
 
+// Adapter para las Tarjetas
 class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var tarjetas = mutableListOf<Tarjeta>()

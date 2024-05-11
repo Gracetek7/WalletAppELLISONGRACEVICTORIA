@@ -23,7 +23,8 @@ import java.util.Locale
 
 class TarjetaSIPViewModel (private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModel() {
 
-    // LiveData para almacenar la tarjeta SIP del usuario
+    // MutableLiveData para almacenar la tarjeta SIP del usuario
+    // el valor de los datos almacenados dentro de este puede ser modificado
     private val _tarjetasSIP = MutableLiveData<Tarjeta.TarjetaSIP?>()
     val tarjetasSIP: MutableLiveData<Tarjeta.TarjetaSIP?> get() = _tarjetasSIP
 
@@ -41,6 +42,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> get() = _error
 
+    // Método para cargar la Tarjeta SIP del usuario
     fun cargarTarjetaSIPUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
@@ -59,6 +61,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         }
     }
 
+    // Método para modificar la tarjeta SIP
     fun modificarTarjetaSIP(id: Int, tarjetaSIP: Tarjeta.TarjetaSIP) {
         viewModelScope.launch {
             Log.d("TarjetaSIPViewModel", "Tarjeta SIP id: $id")
@@ -78,8 +81,8 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
             try {
                 val response = tarjetaSIP.id.let { tarjetasRepository.eliminarTarjetaSIP(it) }
                 if (response?.isSuccessful == true) {
-                    // Tarjeta eliminada exitosamente
-                    // Aquí también puedes actualizar la lista de tarjetas DNI si lo deseas
+                    // Si la tarjeta se eliminó correctamente
+                    // Actualiza la lista de tarjetas SIP
                     //_tarjetasSIP.value = tarjetaSIP
                 } else {
                     Log.e("TarjetaSIPViewModel", "error al eliminar la tarjeta sip")
@@ -90,8 +93,10 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         }
     }
 
+
+
     // Dialógo para crear nueva Tarjeta SIP
-    fun mostrarDialogoCrearTarjetaSIP(usuario: String) {
+    fun mostrarDialogoCrearTarjetaSIP(usuario: String, tarjetaSIP: Tarjeta.TarjetaSIP? = null) {
         Log.d("UsuarioViewModel", "en el metodo de mostrar Dialogo crear tarjeta SIP")
 
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialogo_crear_tarjeta_sip, null)
@@ -111,8 +116,10 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         val editTextEnfermeraAsignada = dialogView.findViewById<EditText>(R.id.tvEnfermeraAsignadaUsuario)
         val editTextTelefonosUrgenciasCitaPrevia = dialogView.findViewById<EditText>(R.id.tvTelefonosUrgenciasCitaPrevia)
 
+        // Formato a mostrar al usuario
         val formatoMostrar = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
+        // Click Listeners para mostrar las fechas en formato deseado
         editTextFechaEmision.setOnClickListener {
             mostrarDatePickerDialog(editTextFechaEmision, formatoMostrar)
         }
@@ -124,6 +131,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         val alertDialog = AlertDialog.Builder(context
         )
             .setView(dialogView)
+            // Al pulsar el boton de crear se comprueban las fechas introducidas y se crea la tarjeta SIP
             .setPositiveButton("Crear") { dialog, _ ->
                 val apellidosNombre = editTextApellidosNombre.text.toString().uppercase()
                 val numeroSip = editTextNumeroSip.text.toString()
@@ -140,13 +148,14 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
                 val enfermeraAsignada = editTextEnfermeraAsignada.text.toString().uppercase()
                 val telefonosUrgenciasCitaPrevia = editTextTelefonosUrgenciasCitaPrevia.text.toString()
 
+                // Formato a enviar a
                 val formatoInput = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
                 val fechaEmision: Date? = formatoInput.parse((fechaEmisionStr))
                 val fechaCaducidad: Date? = formatoInput.parse((fechaCaducidadStr))
 
                 if (fechaEmision != null && fechaCaducidad != null) {
-                    // Si se han ingresado fechas válidas
+                    // Si se han ingresado fechas válidas sigue con la creación de la tarjeta SIP
                     viewModelScope.launch {
                         try {
                             crearTarjetaSIP(
@@ -171,7 +180,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
                         }
                     }
                 } else {
-                    // Mostrar mensaje de error si las fechas ingresadas no son válidas
+                    // Muestra error si las fechas ingresadas no son válidas
                     _error.postValue("Por favor, ingrese fechas válidas en formato dd/MM/yyyy.")
                 }
                 dialog.dismiss()
@@ -203,7 +212,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         telefonosUrgenciasCitaPrevia: String
     ) {
         try {
-            // Crear la nueva tarjeta DNI con los datos proporcionados
+            // Crea nueva tarjeta SIP con los datos proporcionados por el usuario
             val nuevaTarjeta = Tarjeta.TarjetaSIP (
                 idUsuario = usuario,
                 apellidosNombre = apellidosNomnre,
@@ -221,13 +230,14 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
                 enfermeraAsignada = enfermeraAsignada,
                 telefonosUrgenciasCitaPrevia = telefonosUrgenciasCitaPrevia)
 
-            // Llama al método en el repositorio para insertar la nueva tarjeta DNI
+            // Llama al método en el repositorio para insertar la nueva tarjeta DNI del usuario
             crearTarjetaSIPDesdeObjeto(nuevaTarjeta)
         } catch (e: ParseException) {
             _error.postValue("Error al parsear la fecha: ${e.message}" + fechaEmision + fechaCaducidad)
         }
     }
 
+    // Muestra un diálogo para las fechas
     private fun mostrarDatePickerDialog(editText: EditText, formato: SimpleDateFormat) {
         val calendar = Calendar.getInstance()
         val datePickerDialog = DatePickerDialog(
@@ -244,6 +254,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         datePickerDialog.show()
     }
 
+    // Método para insertar la nueva tarjeta SIP del usuario en el repositorio
     suspend fun crearTarjetaSIPDesdeObjeto(nuevaTarjeta: Tarjeta.TarjetaSIP) {
         _isLoading.postValue(true)
         try {
@@ -261,6 +272,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
             _isLoading.postValue(false)
         }
     }
+    // Carga la lista de tarjetas del usuario asociado
     fun cargarTarjetasUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
@@ -274,5 +286,4 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
             }
         }
     }
-
 }

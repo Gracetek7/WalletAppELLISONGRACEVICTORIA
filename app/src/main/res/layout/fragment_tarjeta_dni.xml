@@ -24,9 +24,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
+            android:textStyle="bold"
             android:text="@string/tarjeta_dni"
             android:textAlignment="center"
-            android:textSize="20sp" />
+            android:textSize="25sp" />
 
         <!-- Tarjeta con esquinas redondeadas y sombra -->
     <androidx.cardview.widget.CardView

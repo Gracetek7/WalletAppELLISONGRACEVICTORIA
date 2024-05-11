@@ -59,6 +59,9 @@ dependencies {
 
     // Glide img
     implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation("androidx.privacysandbox.tools:tools-core:1.0.0-alpha08")
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.firebase:firebase-messaging-ktx:24.0.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
 
     // Retrofit para hacer peticiones HTTP

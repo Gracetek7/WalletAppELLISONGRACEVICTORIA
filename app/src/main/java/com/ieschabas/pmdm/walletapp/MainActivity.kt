@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
+        // Menú lateral con las opciones de navegar hacía el menú principal(home), hacía tarjeta DNI y tarjta SIP
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_usuario, R.id.nav_tarjeta_dni, R.id.nav_tarjeta_sip
@@ -47,13 +47,13 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // Inicializar tarjetasRepository
+        // Inicializa tarjetasRepository
         tarjetasRepository = TarjetasRepository(TarjetasApi())
 
         val usuarioId = obtenerIdUsuario()
 
         usuarioId?.let { id ->
-            // Use the custom ViewModelProvider.Factory to create an instance of UsuarioViewModel
+            // ViewModelProvider Factory personalizadao para crear la instancia de UsuarioViewModel
             val viewModelFactory = UsuarioViewModelFactory(this, tarjetasRepository)
             viewModel =
                 ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
@@ -61,12 +61,11 @@ class MainActivity : AppCompatActivity() {
                 viewModel.cargarUsuarioActual(id)
             }
 
-            // Observar cuando se complete la carga del usuario actual y sus tarjetas
+            // Completa la carga del usuario actual y sus tarjetas
             viewModel.usuarioActual.observe(this) { usuario ->
                 usuario?.let {
                     Log.d("MainActivity", "Usuario cargado: $it")
-
-                    // Si se cargó correctamente el usuario, navegamos al destino UsuarioFragment
+                    // Si se cargó correctamente el usuario, navega hacía UsuarioFragment
                     val navController = findNavController(R.id.nav_host_fragment_content_main)
                     // Aquí navegamos directamente al UsuarioFragment
                     navController.navigate(R.id.nav_usuario)
@@ -74,18 +73,21 @@ class MainActivity : AppCompatActivity() {
             }
 
         } ?: run {
-            mostrarError("No se pudo obtener el ID del usuario")
+            mostrarError("Error, al obtener el ID del usuario")
         }
     }
 
+    // Obtiene el id del Usuario
     private fun obtenerIdUsuario(): String? {
         // Devuelve el ID de usuario del Firebase Authentication, o null si no se ha iniciado sesión
         return FirebaseAuth.getInstance().currentUser?.uid
     }
 
+    // Muestra errores
     private fun mostrarError(mensaje: String) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
     }
+    // Menu controller
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

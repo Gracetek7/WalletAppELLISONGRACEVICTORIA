@@ -1,5 +1,8 @@
 package com.ieschabas.pmdm.walletapp.ui.usuario
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,17 +13,35 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.google.firebase.auth.FirebaseAuth
 import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
+import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPFragment
 
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetasAdapter.OnTarjetaClickListener {
+
+    // Método que pide el permiso al usuario para las notificaciones push
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            enviarNotificacionAlServidor()
+        } else {
+            // TODO: Informar al usuario que tu aplicación no mostrará notificaciones.
+        }
+    }
+
     constructor() : this(TarjetasRepository(TarjetasApi()))
 
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
+    private lateinit var navController: NavController
 
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
@@ -37,69 +58,73 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        navController = Navigation.findNavController(view)
+
         val recyclerView = binding.recyclerView
 
         val btnAgregarTarjeta = binding.btnAgregarTarjeta
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Inicializar el adaptador de tarjetas
-        tarjetasAdapter = TarjetasAdapter(this) // Pasar una instancia de UsuarioFragment como listener
-        recyclerView.adapter = tarjetasAdapter  // Configurar el adaptador en el RecyclerView
+        // Inicializa el adaptador de tarjetas
+        tarjetasAdapter = TarjetasAdapter(this) // Pasa la instancia de UsuarioFragment como listener
+        recyclerView.adapter = tarjetasAdapter  // Configura el adaptador en el RecyclerView
 
         val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
         viewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
 
-        // Observar las tarjetas del usuario después de cargarlas
         viewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
             tarjetas?.let {
                 // Actualizar el adaptador con las nuevas tarjetas
                 tarjetasAdapter.updateData(tarjetas)
-                // Agregar un mensaje de depuración para verificar el número de tarjetas recibidas
                 Log.d("UsuarioFragment", "Número de tarjetas: ${tarjetas.size}")
             }
         }
 
-        // Observar los errores
+        // Observa los errores
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
         cargarUsuarioActual() // Carga el usuario actual y sus tarjetas asociadas
 
+        // Botón para crear nueva Tarjeta (DNI/SIP/Permiso Circulacion/Otro)
         btnAgregarTarjeta.setOnClickListener {
             Log.d("UsuarioFragment", "Botón Agregar Tarjeta clickeado")
             // Obtener el ID del usuario actual
             val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
             usuarioId?.let {
-                // Si se obtiene el ID del usuario, cargar sus tarjetas asociadas
+                // Si se obtiene el ID del usuario, carga las tarjetas asociadas del usuario
                 viewModel.mostrarFormularioCrearTarjetas(usuarioId)
-                // No es necesario obtener el objeto Usuario aquí, ya que solo necesitas el ID para cargar las tarjetas.
             } ?: run {
                 Log.e("UsuarioFragment", "No se pudo obtener el ID del usuario actual")
             }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    // Método que envia la notificacion push al servidor Firebase Cloud Messaging
+    private fun enviarNotificacionAlServidor() {
+        // Notificación push al servidor usando Firebase Cloud Messaging
+        viewModel.enviarNotificacionAlServidor()
     }
 
+    // Método para manejar el click en la tarjeta
     override fun onTarjetaClick(tarjeta: Tarjeta) {
-        // Aquí colocas la lógica que deseas realizar cuando se hace clic en una tarjeta
-        // Por ejemplo, podrías abrir una nueva pantalla o mostrar información adicional sobre la tarjeta.
+        // Mostrar las tarjetas en pantalla completa al hacer click
     }
-
+    // Método para manejar el click largo en la tarjeta
     override fun onTarjetaLongClick(tarjeta: Tarjeta, position: Int) {
-        // Aquí colocas la lógica que deseas realizar cuando se hace un clic largo en una tarjeta
-        // Por ejemplo, podrías mostrar un menú contextual o realizar una acción específica.
+        // Imprimir la tarjeta en formato pdf
     }
-
+    // Método para cargar al usuario actual por su id
     private fun cargarUsuarioActual() {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let { id ->
             viewModel.cargarTarjetasUsuario(id)
         }
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
+// Muestra los campos de la tarjeta sip el item_tarjeta_sip y del usuario en el TarjetaSIPFragment
 class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding,private val listener: TarjetasAdapter.OnTarjetaClickListener) : RecyclerView.ViewHolder(binding.root) {
 
     private val tvApellidosNombre: TextView = itemView.findViewById(R.id.tvApellidosNombreUsuario)
