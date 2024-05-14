@@ -48,9 +48,9 @@
     <string name="apellidos_nombre">APELLIDOS Y NOMBRE: </string>
     <string name="fab_description">Descripcion\n</string>
     <string name="agregar_tarjeta">Agregar Tarjeta</string>
-    <string name="fecha_expedicion">Fecha de Expedición (dd/mm/aaaa)</string>
-    <string name="fecha_nacimiento">Fecha de Nacimiento (dd/mm/aaaa)</string>
-    <string name="fecha_caducidad_2">Fecha de Caducidad (dd/mm/aaaa) </string>
+    <string name="fecha_expedicion">Fecha de Expedición</string>
+    <string name="fecha_nacimiento">Fecha de Nacimiento</string>
+    <string name="fecha_caducidad_2">Fecha de Caducidad</string>
     <string name="numero_documento">Número de Documento</string>
 
     <!-- Menu  -->

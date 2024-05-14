@@ -1,8 +1,5 @@
 package com.ieschabas.pmdm.walletapp.ui.usuario
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.ieschabas.pmdm.walletapp.adapter.TarjetasAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +18,13 @@ import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
-import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPFragment
+import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIViewModel
+
+interface UsuarioFragmentListener {
+    fun seleccionarFoto()
+    fun seleccionarFirma()
+}
+
 
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetasAdapter.OnTarjetaClickListener {
 
@@ -42,9 +44,23 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
     private lateinit var viewModel: UsuarioViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
     private lateinit var navController: NavController
+    private lateinit var tarjetaDNIViewModel: TarjetaDNIViewModel
+
 
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
+
+
+    private var usuarioFragmentListener: UsuarioFragmentListener? = null
+
+    // Lógica para abrir la galería cuando sea necesario seleccionar una foto o una firma
+    private fun abrirGaleriaParaSeleccionarFoto() {
+        usuarioFragmentListener?.seleccionarFoto()
+    }
+
+    private fun abrirGaleriaParaSeleccionarFirma() {
+        usuarioFragmentListener?.seleccionarFirma()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,6 +115,9 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
                 Log.e("UsuarioFragment", "No se pudo obtener el ID del usuario actual")
             }
         }
+
+        //tarjetaDNIViewModel.setFragmentListener(this)
+
     }
 
     // Método que envia la notificacion push al servidor Firebase Cloud Messaging

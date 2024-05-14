@@ -1,16 +1,22 @@
 package com.ieschabas.pmdm.walletapp.ui.tarjetaDNI
 
+import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +29,7 @@ import com.ieschabas.pmdm.walletapp.databinding.FragmentTarjetaDniBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,11 +73,15 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         val viewModelFactory = TarjetaDNIViewModelFactory(requireContext(), repository)
         viewModel = ViewModelProvider(this, viewModelFactory)[TarjetaDNIViewModel::class.java]
 
+        viewModel.setFragmentListener(fragmentListener)
+
         return root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Coroutine para obtener la tarjeta DNI
         lifecycleScope.launch {
             // Inicializar tarjetaDNI dentro de la coroutine
@@ -78,8 +89,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
 
             // Carga la tarjeta DNI del usuario
             tarjetaDNI?.let { cargarTarjetaDNIUsuario(it) }
-
-            viewModel.setFragmentListener(fragmentListener)
 
             // Configurar clic en la tarjeta para modificar
             binding.root.setOnClickListener {
@@ -104,6 +113,115 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                     mostrarDialogoEliminar(it)
                 }
             }
+        }
+    }
+    // Dentro de la función donde obtienes la imagen seleccionada
+    private fun guardarImagenEnBaseDeDatos(uri: Uri) {
+        // Convertir la imagen a un Bitmap
+        val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
+
+        // Convertir el Bitmap a una cadena Base64
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        val imageBytes: ByteArray = outputStream.toByteArray()
+        val imageBase64: String = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+
+        // Guardar la cadena Base64 en la base de datos
+        // Aquí necesitarás llamar a tu método para guardar en la base de datos MySQL
+        guardarImagenEnBaseDeDatosMySQL(imageBase64)
+    }
+
+    // Función para guardar la imagen en la base de datos MySQL
+    private fun guardarImagenEnBaseDeDatosMySQL(imageBase64: String) {
+        // Aquí deberías llamar a tu función para guardar en la base de datos MySQL
+        // Puedes usar Retrofit, Room, o cualquier otra forma de interactuar con tu base de datos
+        // Por ejemplo, si estás utilizando Retrofit, enviarías la cadena Base64 a través de una solicitud POST
+        // a tu API que luego la insertaría en la base de datos
+    }
+
+
+    companion object {
+        private const val READ_EXTERNAL_STORAGE = 123
+        private const val SELECT_IMAGE_REQUEST_CODE = 456
+    }
+
+    private var isSelectingPhoto: Boolean = true
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission granted, launch the image picker
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            imagePickerLauncher.launch(intent)
+        } else {
+            // Permission denied, show a message to the user
+            Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Función para solicitar permiso de almacenamiento externo
+    private fun requestExternalStoragePermission() {
+        // Solicitar permiso al usuario
+        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
+    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
+        // Lógica para seleccionar la imagen
+        this.isSelectingPhoto = isSelectingPhoto
+        val imageType = if (isSelectingPhoto) "foto" else "firma"
+        Log.d("TarjetaDNIFragment", "Iniciando selección de $imageType")
+
+        // Verificar si el permiso para leer el almacenamiento externo ha sido concedido
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            // Permiso concedido, proceder con la selección de imagen
+            lanzarActividadSeleccionImagen()
+        } else {
+            // Permiso no concedido, solicitar permiso
+            Log.d("TarjetaDNIFragment", "Permiso de almacenamiento externo no concedido. Solicitando permiso...")
+            requestExternalStoragePermission()
+        }
+    }
+
+    // Función para lanzar la actividad de selección de imagen una vez que se conceda el permiso
+    private fun lanzarActividadSeleccionImagen() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+        }
+        Log.d("TarjetaDNIFragment", "Lanzando actividad de selección de imagen...")
+        imagePickerLauncher.launch(intent)
+    }
+
+    // Resultado de la selección de la imagen desde la galería
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Log.d("TarjetaDNIFragment", "Resultado de la selección de imagen: RESULT_OK")
+            val data: Intent? = result.data
+            if (data != null) {
+                val selectedImageUri: Uri? = data.data
+                if (selectedImageUri != null) {
+                    Log.d("TarjetaDNIFragment", "URI de la imagen seleccionada: $selectedImageUri")
+                    viewModel.handleSeleccionImagenResult(isSelectingPhoto, selectedImageUri)
+                } else {
+                    Log.d("TarjetaDNIFragment", "Error: No se pudo obtener la URI de la imagen seleccionada")
+                }
+            }
+        } else {
+            Log.d("TarjetaDNIFragment", "Error, se canceló la selección de la imagen")
+        }
+    }
+
+    // Función para mostrar la imagen seleccionada en el ImageView correspondiente
+    private fun mostrarImagenSeleccionada(uri: Uri?, isSelectingPhoto: Boolean) {
+        if (isSelectingPhoto) {
+            // Mostrar imagen seleccionada en el ImageView correspondiente para la foto
+            binding.ivFotografia.setImageURI(uri)
+        } else {
+            // Mostrar imagen seleccionada en el ImageView correspondiente para la firma
+            binding.ivFirma.setImageURI(uri)
         }
     }
 
@@ -171,6 +289,8 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                         getString(R.string.domicilio),
                         tarjetaDNI.domicilio
                     )
+
+
                     if (tarjetaDNI.fotografiaUrl.isNotEmpty()) {
                         Picasso.get()
                             .load(tarjetaDNI.fotografiaUrl)
@@ -324,64 +444,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         }
         val dialog = builder.create()
         dialog.show()
-    }
-
-    // Método para mostrar la imagen seleccionada en un diálogo
-    private fun mostrarImagenesSeleccionadas(uriFoto: Uri?, uriFirma: Uri?) {
-
-        // Configura las imágenes seleccionadas en los ImageViews del diálogo
-        dialog?.let { dialog ->
-            uriFoto?.let {
-                dialog.findViewById<ImageView>(R.id.btnSeleccionarFoto)?.setImageURI(uriFoto)
-            }
-            uriFirma?.let {
-                dialog.findViewById<ImageView>(R.id.btnSeleccionarFirma)?.setImageURI(uriFirma)
-            }
-
-            // Muestra el diálogo si no está siendo mostrado actualmente
-            if (!dialog.isShowing) {
-                dialog.show()
-            }
-        }
-    }
-
-    private var isSelectingPhoto: Boolean = true
-
-
-    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
-        // Lógica para seleccionar la imagen
-        this.isSelectingPhoto = isSelectingPhoto
-        val imageType = if (isSelectingPhoto) "foto" else "firma"
-        Log.d("UsuarioFragment", "Iniciando selección de $imageType")
-        // Lanzar la actividad para seleccionar la imagen
-        imagePickerLauncher.launch("image/*")
-    }
-
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            // Check which type of image is being selected and handle accordingly
-            if (viewModel.fotoSeleccionadaUrl.value == null) {
-                viewModel.handleSeleccionFotoResult(uri)
-            } else if (viewModel.firmaSeleccionadaUrl.value == null) {
-                viewModel.handleSeleccionFirmaResult(uri)
-            } else {
-                Log.d("UsuarioFragment", "Both images already selected")
-            }
-
-            // Check if both images have been selected
-            if (viewModel.fotoSeleccionadaUrl.value != null && viewModel.firmaSeleccionadaUrl.value != null) {
-                // If both images have been selected, show them
-                viewModel.fotoSeleccionadaUrl.value?.let { uriFoto ->
-                    viewModel.firmaSeleccionadaUrl.value?.let { uriFirma ->
-                        mostrarImagenesSeleccionadas(uriFoto, uriFirma)
-                    }
-                }
-            }
-        } else {
-            Log.d("UsuarioFragment", "Error: Se ha cancelado la selección de la imagen")
-        }
     }
 
     private fun eliminarTarjeta(tarjetaDNI: Tarjeta.TarjetaDNI) {

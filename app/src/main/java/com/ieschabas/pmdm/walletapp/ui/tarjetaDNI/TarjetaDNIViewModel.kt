@@ -22,23 +22,20 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
-// Listener Fragment para escuchar los clicks del Fragment en imágenes a seleccionar
 interface TarjetaDNIFragmentListener {
-
-    // Método para seleccionar las imágenes
+    // Método para seleccionar la foto
     fun seleccionarFoto()
+
+    // Método para seleccionar la firma
     fun seleccionarFirma()
 }
 
 class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepository: TarjetasRepository, ) : ViewModel() {
 
-    // Fragment Listener para seleccionar las imágenes
-    private var fragmentListener: TarjetaDNIFragmentListener? = null
-
     private val _tarjetasUsuario = MutableLiveData<List<Tarjeta>>()
     val tarjetasUsuario: LiveData<List<Tarjeta>> get() = _tarjetasUsuario
 
+    private var fragmentListener: TarjetaDNIFragmentListener? = null
     // Método para establecer el listener del fragmento
     fun setFragmentListener(listener: TarjetaDNIFragmentListener) {
         fragmentListener = listener
@@ -67,17 +64,6 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
     private val _firmaSeleccionadaUrl = MutableLiveData<Uri?>()
     val firmaSeleccionadaUrl: LiveData<Uri?> get() = _firmaSeleccionadaUrl
 
-    // Método para manejar el resultado de la selección de la foto
-    fun handleSeleccionFotoResult(uri: Uri?) {
-        _fotoSeleccionadaUrl.value = uri
-        Log.d("UsuarioViewModel", "URI de la foto seleccionada: $uri")
-    }
-
-    // Método para manejar el resultado de la selección de la firma
-    fun handleSeleccionFirmaResult(uri: Uri?) {
-        _firmaSeleccionadaUrl.value = uri
-        Log.d("UsuarioViewModel", "URI de la firma seleccionada: $uri")
-    }
 
     // LiveData para manejar el estado de carga
     private val _isLoading = MutableLiveData<Boolean>()
@@ -95,7 +81,6 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         // Cargar las tarjetas DNI del usuario cuando se crea la instancia de la vista
         cargarTarjetaDNIUsuario(usuarioId)
     }
-
     fun cargarTarjetaDNIUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
@@ -374,5 +359,16 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         calendar.time = fechaExpedicion
         calendar.add(Calendar.YEAR, 10)
         return calendar.time
+    }
+
+    // Método para manejar el resultado de la selección de la foto
+    fun handleSeleccionImagenResult(isSelectingPhoto: Boolean, uri: Uri) {
+        if (isSelectingPhoto) {
+            _fotoSeleccionadaUrl.value = uri
+            fragmentListener?.seleccionarFoto()
+        } else {
+            _firmaSeleccionadaUrl.value = uri
+            fragmentListener?.seleccionarFirma()
+        }
     }
 }
