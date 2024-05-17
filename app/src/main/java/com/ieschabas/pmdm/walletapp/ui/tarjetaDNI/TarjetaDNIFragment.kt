@@ -34,6 +34,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+//interface ImageSelectionListener {
+//    fun selectImage(isSelectingPhoto: Boolean)
+//}
+
 class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment() {
 
     constructor() : this(TarjetasRepository(TarjetasApi()))
@@ -77,8 +81,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
 
         return root
     }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -113,8 +115,10 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                     mostrarDialogoEliminar(it)
                 }
             }
+
         }
     }
+
     // Dentro de la función donde obtienes la imagen seleccionada
     private fun guardarImagenEnBaseDeDatos(uri: Uri) {
         // Convertir la imagen a un Bitmap
@@ -165,7 +169,7 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         // Solicitar permiso al usuario
         requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
-    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
+    fun seleccionarImagen(isSelectingPhoto: Boolean) {
         // Lógica para seleccionar la imagen
         this.isSelectingPhoto = isSelectingPhoto
         val imageType = if (isSelectingPhoto) "foto" else "firma"

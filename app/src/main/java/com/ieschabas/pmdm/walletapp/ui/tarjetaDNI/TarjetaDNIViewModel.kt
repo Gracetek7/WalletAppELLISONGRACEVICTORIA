@@ -49,6 +49,14 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
     fun llamarSeleccionarFirma() {
         fragmentListener?.seleccionarFirma()
     }
+    fun handleSeleccionFoto(selectedImageUri: Uri) {
+        _fotoSeleccionadaUrl.value = selectedImageUri
+    }
+
+    fun handleSeleccionFirma(selectedImageUri: Uri) {
+        _firmaSeleccionadaUrl.value = selectedImageUri
+    }
+
 
     private val usuarioId: String = ""
 

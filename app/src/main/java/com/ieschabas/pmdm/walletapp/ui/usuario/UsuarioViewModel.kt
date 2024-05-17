@@ -80,18 +80,22 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         }
     }
 
-    fun mostrarFormularioCrearTarjetas(usuario: String) {
-        Log.d("UsuarioViewModel", "UsuarioViewModel, en el metodo de mostrar formulario crear tarjetas")
-        val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación","Otro")
+    fun mostrarFormularioCrearTarjetas(usuario: String, listener: (Boolean) -> Unit) {
+        val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación", "Otro")
 
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Crear Tarjeta")
         builder.setItems(opcionesTarjeta) { _, which ->
             usuario.let { user ->
                 when (which) {
-                    0 -> tarjetaDNIViewModel.mostrarDialogoCrearTarjetaDNI(user)
-                    1 -> tarjetaSIPViewModel.mostrarDialogoCrearTarjetaSIP(user)
-                    //2 -> tarjetaPermisoCirculacionViewModel.mostrarDialogoCrearTarjetaPermiso(user)
+                    0 -> {
+                        listener(true) // Indicar que se ha seleccionado "DNI"
+                        tarjetaDNIViewModel.mostrarDialogoCrearTarjetaDNI(user)
+                    }
+                    else -> {
+                        listener(false) // Indicar que no se ha seleccionado "DNI"
+                        // Realizar otras acciones según la opción seleccionada
+                    }
                 }
             }
         }
@@ -99,6 +103,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         val dialog = builder.create()
         dialog.show()
     }
+
 
     suspend fun actualizarUsuarioActual(usuarioActualizado: Usuario) {
         _isLoading.value = true

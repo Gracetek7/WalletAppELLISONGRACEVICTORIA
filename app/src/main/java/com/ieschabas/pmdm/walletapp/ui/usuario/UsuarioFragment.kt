@@ -1,5 +1,8 @@
 package com.ieschabas.pmdm.walletapp.ui.usuario
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,49 +21,23 @@ import com.ieschabas.pmdm.walletapp.data.TarjetasApi
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.databinding.FragmentUsuarioBinding
 import com.ieschabas.pmdm.walletapp.model.tarjetas.Tarjeta
+import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIFragmentListener
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIViewModel
-
-interface UsuarioFragmentListener {
-    fun seleccionarFoto()
-    fun seleccionarFirma()
-}
-
+import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIViewModelFactory
 
 class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Fragment(), TarjetasAdapter.OnTarjetaClickListener {
 
-    // Método que pide el permiso al usuario para las notificaciones push
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            enviarNotificacionAlServidor()
-        } else {
-            // TODO: Informar al usuario que tu aplicación no mostrará notificaciones.
-        }
-    }
-
     constructor() : this(TarjetasRepository(TarjetasApi()))
 
-    private lateinit var viewModel: UsuarioViewModel
+    private lateinit var usuarioViewModel: UsuarioViewModel
+    private lateinit var tarjetaDNIViewModel: TarjetaDNIViewModel
     private lateinit var tarjetasAdapter: TarjetasAdapter
     private lateinit var navController: NavController
-    private lateinit var tarjetaDNIViewModel: TarjetaDNIViewModel
-
 
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
 
-
-    private var usuarioFragmentListener: UsuarioFragmentListener? = null
-
-    // Lógica para abrir la galería cuando sea necesario seleccionar una foto o una firma
-    private fun abrirGaleriaParaSeleccionarFoto() {
-        usuarioFragmentListener?.seleccionarFoto()
-    }
-
-    private fun abrirGaleriaParaSeleccionarFirma() {
-        usuarioFragmentListener?.seleccionarFirma()
-    }
+    private var isSelectingPhoto: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +45,25 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentUsuarioBinding.inflate(inflater, container, false)
+
+        val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
+        usuarioViewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
+
+
+        val tarjetaDNIViewModelFactory = TarjetaDNIViewModelFactory(requireContext(), tarjetasRepository)
+        tarjetaDNIViewModel = ViewModelProvider(this, tarjetaDNIViewModelFactory)[TarjetaDNIViewModel::class.java]
+
+        val tarjetaDNIFragmentListener = object : TarjetaDNIFragmentListener {
+            override fun seleccionarFoto() {
+                seleccionarImagen(true)
+            }
+
+            override fun seleccionarFirma() {
+                seleccionarImagen(false)
+            }
+        }
+        tarjetaDNIViewModel.setFragmentListener(tarjetaDNIFragmentListener)
+
         return binding.root
     }
 
@@ -77,73 +73,90 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         navController = Navigation.findNavController(view)
 
         val recyclerView = binding.recyclerView
-
         val btnAgregarTarjeta = binding.btnAgregarTarjeta
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Inicializa el adaptador de tarjetas
-        tarjetasAdapter = TarjetasAdapter(this) // Pasa la instancia de UsuarioFragment como listener
-        recyclerView.adapter = tarjetasAdapter  // Configura el adaptador en el RecyclerView
+        tarjetasAdapter = TarjetasAdapter(this)
+        recyclerView.adapter = tarjetasAdapter
 
-        val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
-        viewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
+        val usuarioViewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
+        usuarioViewModel = ViewModelProvider(this, usuarioViewModelFactory)[UsuarioViewModel::class.java]
 
-        viewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
+        usuarioViewModel.tarjetasUsuario.observe(viewLifecycleOwner) { tarjetas ->
             tarjetas?.let {
-                // Actualizar el adaptador con las nuevas tarjetas
                 tarjetasAdapter.updateData(tarjetas)
                 Log.d("UsuarioFragment", "Número de tarjetas: ${tarjetas.size}")
             }
         }
 
-        // Observa los errores
-        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+        usuarioViewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
-        cargarUsuarioActual() // Carga el usuario actual y sus tarjetas asociadas
+        cargarUsuarioActual()
 
-        // Botón para crear nueva Tarjeta (DNI/SIP/Permiso Circulacion/Otro)
         btnAgregarTarjeta.setOnClickListener {
             Log.d("UsuarioFragment", "Botón Agregar Tarjeta clickeado")
-            // Obtener el ID del usuario actual
             val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
-            usuarioId?.let {
-                // Si se obtiene el ID del usuario, carga las tarjetas asociadas del usuario
-                viewModel.mostrarFormularioCrearTarjetas(usuarioId)
+            usuarioId?.let { id ->
+                usuarioViewModel.mostrarFormularioCrearTarjetas(id) { isDNISelected ->
+                    if (!isDNISelected) {
+                        tarjetaDNIViewModel.mostrarDialogoCrearTarjetaDNI(id)
+                    }
+                }
             } ?: run {
                 Log.e("UsuarioFragment", "No se pudo obtener el ID del usuario actual")
             }
         }
 
-        //tarjetaDNIViewModel.setFragmentListener(this)
-
     }
 
-    // Método que envia la notificacion push al servidor Firebase Cloud Messaging
-    private fun enviarNotificacionAlServidor() {
-        // Notificación push al servidor usando Firebase Cloud Messaging
-        viewModel.enviarNotificacionAlServidor()
-    }
-
-    // Método para manejar el click en la tarjeta
     override fun onTarjetaClick(tarjeta: Tarjeta) {
         // Mostrar las tarjetas en pantalla completa al hacer click
     }
-    // Método para manejar el click largo en la tarjeta
+
     override fun onTarjetaLongClick(tarjeta: Tarjeta, position: Int) {
         // Imprimir la tarjeta en formato pdf
     }
-    // Método para cargar al usuario actual por su id
+
     private fun cargarUsuarioActual() {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let { id ->
-            viewModel.cargarTarjetasUsuario(id)
+            usuarioViewModel.cargarTarjetasUsuario(id)
         }
     }
+
+    private fun seleccionarImagen(isSelectingPhoto: Boolean) {
+        this.isSelectingPhoto = isSelectingPhoto
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
+        }
+        imagePickerLauncher.launch(intent)
+    }
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+            val selectedImageUri: Uri? = data?.data
+            selectedImageUri?.let {
+                // Pasa la URI seleccionada al ViewModel correspondiente
+                if (isSelectingPhoto) {
+                    tarjetaDNIViewModel.handleSeleccionFoto(selectedImageUri)
+                } else {
+                    tarjetaDNIViewModel.handleSeleccionFirma(selectedImageUri)
+                }
+            }
+        }
+    }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+}
 
+interface TarjetaDNIFragmentListener {
+    fun seleccionarFoto()
+    fun seleccionarFirma()
 }
