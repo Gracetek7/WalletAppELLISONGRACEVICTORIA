@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity() {
             viewModel.usuarioActual.observe(this) { usuario ->
                 usuario?.let {
                     Log.d("MainActivity", "Usuario cargado: $it")
-                    // Si se cargó correctamente el usuario, navega hacía UsuarioFragment
+                    // Si se cargó correctamente el usuario, navegará hacía UsuarioFragment
                     val navController = findNavController(R.id.nav_host_fragment_content_main)
-                    // Aquí navegamos directamente al UsuarioFragment
+                    // Navega a UsuarioFragment
                     navController.navigate(R.id.nav_usuario)
                 }
             }
@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
     private fun mostrarError(mensaje: String) {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show()
     }
+
     // Menu controller
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)

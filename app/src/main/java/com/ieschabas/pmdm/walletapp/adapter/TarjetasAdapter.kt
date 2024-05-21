@@ -18,11 +18,11 @@ class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerVi
         return when (viewType) {
             TIPO_TARJETA_DNI -> {
                 val binding = ItemTarjetaDniBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                TarjetaDNViewHolder(binding, listener) // Pasar el listener para Tarjeta DNI
+                TarjetaDNViewHolder(binding, listener) // Pasa el listener para la tarjeta DNI
             }
             TIPO_TARJETA_SIP -> {
                 val binding = ItemTarjetaSipBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                TarjetaSIPViewHolder(binding, listener) // Pasar el listener para Tarjeta SIP
+                TarjetaSIPViewHolder(binding, listener) // Pasa el listener para la tarjeta SIP
             }
             else -> throw IllegalArgumentException("Tipo de tarjeta no encontrada")
         }
@@ -30,7 +30,7 @@ class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerVi
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val tarjeta = tarjetas[position]
-        val context = holder.itemView.context // Obtener el contexto del elemento de la vista
+        val context = holder.itemView.context // Obtiene el contexto del elemento de la vista
 
         when (holder.itemViewType) {
             TIPO_TARJETA_DNI -> {
@@ -49,7 +49,7 @@ class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerVi
         return when (tarjetas[position]) {
             is Tarjeta.TarjetaDNI -> TIPO_TARJETA_DNI
             is Tarjeta.TarjetaSIP -> TIPO_TARJETA_SIP
-            else -> throw IllegalArgumentException("Tipo de tarjeta no encontrada")
+            else -> throw IllegalArgumentException("Error, tipo de tarjeta no encontrada")
         }
     }
 
@@ -64,7 +64,7 @@ class TarjetasAdapter(private val listener: OnTarjetaClickListener) : RecyclerVi
         notifyDataSetChanged()
     }
 
-    // Definir la interfaz del listener
+    // Interfaz de los clicks en las tarjetas
     interface OnTarjetaClickListener {
         fun onTarjetaClick(tarjeta: Tarjeta)
         fun onTarjetaLongClick(tarjeta: Tarjeta, position: Int)

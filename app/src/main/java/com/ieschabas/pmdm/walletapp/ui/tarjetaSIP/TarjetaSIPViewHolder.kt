@@ -63,7 +63,7 @@ class TarjetaSIPViewHolder(private val binding: ItemTarjetaSipBinding,private va
         binding.root.setOnLongClickListener {
             Log.d("TarjetaSIPiewHolder", "Clic largo en la tarjeta")
             listener.onTarjetaLongClick(tarjetaSIP, bindingAdapterPosition)
-            true // Indica que el evento ha sido manejado correctamente
+            true
         }
     }
 

@@ -23,7 +23,4 @@ class TarjetaPermisoCirculacionViewModel (private val tarjetasRepository: Tarjet
     val error: LiveData<String>
         get() = _error
 
-    // Muestra el diálogo para crear el Permiso de Circulación
-    private fun mostrarDialogoCrearTarjetaPermiso() {
-    }
 }

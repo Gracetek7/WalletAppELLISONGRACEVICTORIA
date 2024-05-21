@@ -89,29 +89,31 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
     }
 
+    // Obtiene las tarjeta SIP del usuario
     private suspend fun obtenerTarjetaSIP(): Tarjeta.TarjetaSIP? {
         // Verificar si el usuario está autenticado
         usuarioId?.let {
             try {
-                // Obtener la tarjeta DNI del repositorio
+                // Obtiene la tarjeta SIP del repositorio
                 val tarjetasSIP = repository.obtenerTarjetaSIPUsuario(it)
-                // Si se obtiene al menos una tarjeta DNI, tomar la primera (asumiendo que solo hay una por usuario)
+                // Si se obtiene al menos una tarjeta SIP, tomar la primera
                 if (tarjetasSIP.isNotEmpty() && tarjetasSIP[0].numeroSip.isNotEmpty()) {
                     return tarjetasSIP[0]
                 } else {
-                    // Si no se encuentra ninguna tarjeta DNI válida, devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
+                    // Si no se encuentra ninguna tarjeta, no devuelve nada
                     return null
                 }
             } catch (e: Exception) {
-                Log.e("TarjetaDNIFragment", "Error al obtener la tarjeta DNI del usuario: ${e.message}")
-                // Lanzar una excepción si ocurre un error al obtener la tarjeta DNI
+                Log.e("TarjetaSIPFragment", "Error al obtener la tarjeta SIP del usuario: ${e.message}")
+                // Lanza excepción si ocurre error al obtener la tarjeta SIP
                 throw e
             }
         }
-        // Si el usuario no está autenticado, puedes devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
+        // Si el usuario no está autenticado, no devuele nada
         return null
     }
 
+    // Carga la tarjeta SIP del usuario
     private fun cargarTarjetaSIPUsuario(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let {
@@ -175,7 +177,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
     }
 
-    // Declarar una variable para almacenar la fecha seleccionada por el usuario
+    // Variables para almacenar lsa fechas seleccionadas por el usuario
     private var fechaEmisionSeleccionada: Date? = Date()
     private var fechaCaducidadSeleccionada: Date? = Date()
 
@@ -199,7 +201,9 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         val etTelefonosUrgenciasCitaPrevia = dialogLayout.findViewById<EditText>(R.id.tvTelefonosUrgenciasCitaPrevia)
         val etApellidosNombre = dialogLayout.findViewById<EditText>(R.id.tvApellidosNombreUsuario)
 
+        // Formato a mostrar al usuario
         val formatoMostrar = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        // Formato a mostrar a enviar al servidor
         val formatoEnviar = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formatoParser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -250,7 +254,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
 
                 tarjetaSIP.id.let { id ->
                     try {
-                        // Convert the String values back to Date objects
                         val fechaEmision = if (fechaEmisionString.isNotEmpty()) {
                             try {
                                 formatoParser.parse(fechaEmisionString)
@@ -271,7 +274,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
                         } else {
                             null
                         }
-                        // Create a new TarjetaSIP object with the updated values
+                        // Crea nuevo objeto tarjeta sip con los datos modificados
                         val nuevaTarjetaSIP = Tarjeta.TarjetaSIP(
                             id = tarjetaSIP.id,
                             idUsuario = tarjetaSIP.idUsuario,
@@ -291,7 +294,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
                             apellidosNombre = nuevosApellidosNombre
                         )
 
-                        // Modify the tarjetaSIP in the database with the updated values
+                        // Envia la tarjeta sip modificada a ViewModel pasando a la base de datos, la tarjeta a modificar
                         viewModel.modificarTarjetaSIP(id, nuevaTarjetaSIP)
                         Log.d("TarjetaSIPFragment", "Tarjeta SIP modificada correctamente")
 
@@ -301,7 +304,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
                 }
             }
             .setNegativeButton("Cancelar") { _, _ ->
-                // Dismiss the dialog when the user clicks on the Cancel button
             }
 
         val dialog = builder.create()
@@ -324,12 +326,12 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
     }
 
-    // Declarar una variable para almacenar la fecha seleccionada por el usuario
+    // Variable para almacenar la fecha seleccionada por el usuario
     private var fechaSeleccionada: Date? = Date()
 
     private val cal = Calendar.getInstance()
 
-    // En la función mostrarDatePickerDialog, actualiza la fecha según el tipo de fecha
+    // Muestra un dialógo para seleccionar la fecha
     private fun mostrarDatePickerDialog(textView: EditText, formatoMostrar: SimpleDateFormat, tipo: String) {
         val datePickerDialog = context?.let {
             DatePickerDialog(
@@ -359,6 +361,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
     }
 
+    // Muestra un diálogo de eliminar la tarjeta SIP
     private fun mostrarDialogoEliminar(tarjetaSIP: Tarjeta.TarjetaSIP) {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Eliminar Tarjeta")
@@ -375,7 +378,9 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         dialog.show()
     }
 
+    // Método para eliminar la tarjeta SIP
     private fun eliminarTarjeta(tarjetaSIP: Tarjeta.TarjetaSIP) {
+        // Llama al viewmodel para eliminar la tarjeta sip
         viewModel.eliminarTarjetaSIP(tarjetaSIP)
         Toast.makeText(requireContext(), "TarjetaSIPFragment DNI en metodo de eliminar.", Toast.LENGTH_SHORT).show()
     }

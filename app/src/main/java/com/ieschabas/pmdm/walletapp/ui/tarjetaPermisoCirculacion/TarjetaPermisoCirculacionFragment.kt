@@ -30,7 +30,7 @@ class TarjetaPermisoCirculacionFragment : Fragment() {
 
         viewModel = ViewModelProvider(this)[TarjetaPermisoCirculacionViewModel::class.java]
 
-        // Configurar la barra de herramientas (Toolbar)
+        // Configura la barra de herramientas (Toolbar)
         val toolbar = view?.findViewById<Toolbar>(R.id.toolbar)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
@@ -39,9 +39,6 @@ class TarjetaPermisoCirculacionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Inicializar vistas y mostrar información de la tarjeta
-        //mostrarInformacionTarjeta(tarjeta)
 
         // Configurar clic en la tarjeta para modificar
         view.setOnClickListener {

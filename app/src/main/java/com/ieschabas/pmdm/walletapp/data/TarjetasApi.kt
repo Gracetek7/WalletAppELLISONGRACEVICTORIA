@@ -6,7 +6,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 class TarjetasApi {
 
     val retrofitService: TarjetasService = makeRetrofitService()
-
     // Conexion Retrofit
     private fun makeRetrofitService(): TarjetasService {
         return Retrofit.Builder()

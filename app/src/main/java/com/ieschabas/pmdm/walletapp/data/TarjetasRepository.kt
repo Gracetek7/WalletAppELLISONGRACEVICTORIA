@@ -17,7 +17,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
             Log.d(errorApi, "Llamando a syncUserData")
             tarjetaService.syncUserData(userData)
         } catch (e: Exception) {
-            Log.e(errorApi, "Error al sincronizar datos del usuario: ${e.message}")
+            Log.e(errorApi, "Error, al sincronizar los datos del usuario: ${e.message}")
             null
         }
     }
@@ -76,7 +76,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return tarjetas
     }
 
-    // Obtiene al usuario
+    // Obtiene usuario
     suspend fun getUsuario(id: String): Response<Usuario>? {
         try {
             return tarjetaService.getUsuario(id)
@@ -86,7 +86,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Modifica el usuario
+    // Modifica usuario
     suspend fun modificarUsuario(id: String, usuario: Usuario): Response<Void>? {
         try {
             return tarjetaService.modificarUsuario(id, usuario)
@@ -96,7 +96,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Elimina el usuario
+    // Elimina usuario
     suspend fun eliminarUsuario(id: String): Response<Void>? {
         try {
             return tarjetaService.eliminarUsuario(id)
@@ -106,12 +106,12 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Obtiene la tarjeta DNI asociado al usuario
+    // Obtiene tarjeta DNI asociado al usuario
     suspend fun obtenerTarjetaDNIUsuario(idUsuario: String): List<Tarjeta.TarjetaDNI> {
         Log.d("TarjetasRepository", "ID de usuario recibido: $idUsuario")
         val tarjetas: MutableList<Tarjeta.TarjetaDNI> = mutableListOf()
         try {
-            // Obtener tarjeta SIP
+            // Obtiene tarjeta SIP
             val responseSIP = tarjetaService.getTarjetaDNIUsuario(idUsuario)
             if (responseSIP.isSuccessful) {
                 val tarjetaDNI = responseSIP.body()
@@ -128,7 +128,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return tarjetas
     }
 
-    // Obtiene la tarjeta DNI
+    // Obtiene tarjeta DNI
     suspend fun getTarjetaDNI(id: Int): Response<Tarjeta.TarjetaDNI>? {
         try {
             return tarjetaService.getTarjetaDNI(id)
@@ -148,7 +148,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Modifica la tarjeta DNI
+    // Modifica tarjeta DNI
     suspend fun modificarTarjetaDNI(id: Int): Response<Void>? {
         try {
             return tarjetaService.modificarTarjetaDNI(id)
@@ -158,7 +158,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Elimina la tarjeta DNI
+    // Elimina tarjeta DNI
     suspend fun eliminarTarjetaDNI(id: Int): Response<Void>? {
         try {
             return tarjetaService.eliminarTarjetaDNI(id)
@@ -168,12 +168,12 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return null
     }
 
-    // Obtiene la Tarjeta SIP asociada al Usuario
+    // Obtiene Tarjeta SIP asociada al Usuario
     suspend fun obtenerTarjetaSIPUsuario(idUsuario: String): List<Tarjeta.TarjetaSIP> {
         Log.d("TarjetasRepository", "ID de usuario recibido: $idUsuario")
         val tarjetas: MutableList<Tarjeta.TarjetaSIP> = mutableListOf()
         try {
-            // Obtener tarjeta SIP
+            // Obtiene tarjeta SIP
             val responseSIP = tarjetaService.getTarjetaSIPUsuario(idUsuario)
             if (responseSIP.isSuccessful) {
                 val tarjetaSIP = responseSIP.body()
@@ -190,7 +190,7 @@ class TarjetasRepository(tarjetasApi: TarjetasApi) {
         return tarjetas
     }
 
-    // Obtiene la tarjeta SIP
+    // Obtiene tarjeta SIP
     suspend fun getTarjetaSIP(id: Int): Response<Tarjeta.TarjetaSIP>? {
         try {
             return tarjetaService.getTarjetaSIP(id)

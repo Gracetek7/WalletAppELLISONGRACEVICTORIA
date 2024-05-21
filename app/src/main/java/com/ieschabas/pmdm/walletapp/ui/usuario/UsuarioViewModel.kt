@@ -39,6 +39,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
 
     val error: LiveData<String> get() = _error
 
+    // Recoge al usuario actual y llama al método de cargarTarjetasUsuarios con las tarjetas asociadas al usuario.
     suspend fun cargarUsuarioActual(idUsuario: String) {
         _isLoading.value = true
         try {
@@ -50,13 +51,13 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                     if (usuario != null) {
                         _usuarioActual.postValue(usuario)
                         Log.d("UsuarioViewModel", "Usuario cargado: $usuario")
-                        cargarTarjetasUsuario(idUsuario) // Cargar también las tarjetas del usuario
-                        return // Asegura que no se ejecute más código después de cargar las tarjetas
+                        cargarTarjetasUsuario(idUsuario)
+                        return
                     } else {
                         _error.postValue("Usuario no encontrado")
                     }
                 } else {
-                    _error.postValue("Error al cargar el usuario: ${usuarioResponse.message()}")
+                    _error.postValue("Error, al cargar el usuario: ${usuarioResponse.message()}")
                 }
             }
         } catch (e: Exception) {
@@ -66,20 +67,22 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         }
     }
 
+    // Carga las tarjetas asociadas del usuario
     fun cargarTarjetasUsuario(idUsuario: String) {
         viewModelScope.launch {
             try {
-                Log.d("UsuarioViewModel", "Cargando tarjetas del usuario con ID: $idUsuario")
+                Log.d("UsuarioViewModel", "Cargando las tarjetas del usuario con ID: $idUsuario")
                 val tarjetas = tarjetasRepository.obtenerTarjetasUsuario(idUsuario)
-                Log.d("UsuarioViewModel", "Tarjetas cargadas: $tarjetas")
+                Log.d("UsuarioViewModel", "Total tarjetas cargadas: $tarjetas")
                 _tarjetasUsuario.postValue(tarjetas)
             } catch (e: Exception) {
-                Log.e("UsuarioViewModel", "Error al cargar las tarjetas del usuario: ${e.message}")
-                _error.postValue("Error al cargar las tarjetas del usuario: ${e.message}")
+                Log.e("UsuarioViewModel", "Error, al cargar las tarjetas del usuario: ${e.message}")
+                _error.postValue("Error, al cargar las tarjetas del usuario: ${e.message}")
             }
         }
     }
 
+    // Muestra el diálogo para crear nueva tarjeta (DNI, SIP, Permiso de Circulación, Otro)
     fun mostrarFormularioCrearTarjetas(usuario: String, listener: (Boolean) -> Unit) {
         val opcionesTarjeta = arrayOf("DNI", "SIP", "Permiso de Circulación", "Otro")
 
@@ -88,13 +91,21 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         builder.setItems(opcionesTarjeta) { _, which ->
             usuario.let { user ->
                 when (which) {
+                    // En caso de pulsar la primera opción abre el dialogo de Tarjeta DNI
                     0 -> {
-                        listener(true) // Indicar que se ha seleccionado "DNI"
+                        listener(true)
                         tarjetaDNIViewModel.mostrarDialogoCrearTarjetaDNI(user)
                     }
+                    // En caso de pulsar la segunda opción abre el dialogo de Tarjeta SIP
+                    1 -> {
+                        tarjetaSIPViewModel.mostrarDialogoCrearTarjetaSIP(user)
+                    }
+                    // En caso de pulsar la tercera opción abre el dialogo de Tarjeta PermisoCirculacion
+//                    2 -> {
+//                        tarjetaPermisoCirculacionViewModel.mostrarDialogoCrearTarjetaPermisoCirculacion(user)
+//                    }
                     else -> {
-                        listener(false) // Indicar que no se ha seleccionado "DNI"
-                        // Realizar otras acciones según la opción seleccionada
+                        listener(false)
                     }
                 }
             }
@@ -104,7 +115,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
         dialog.show()
     }
 
-
+    // Método que actualiza usuario actual
     suspend fun actualizarUsuarioActual(usuarioActualizado: Usuario) {
         _isLoading.value = true
         try {
@@ -113,15 +124,16 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             if (response != null && response.isSuccessful) {
                 _usuarioActual.postValue(usuarioActualizado)
             } else {
-                _error.postValue("Error al actualizar el usuario")
+                _error.postValue("Error, al actualizar el usuario")
             }
         } catch (e: Exception) {
-            _error.postValue("Error al actualizar el usuario: ${e.message}")
+            _error.postValue("Error, al actualizar el usuario: ${e.message}")
         } finally {
             _isLoading.value = false
         }
     }
 
+    // Método que elimina usuario actual
     suspend fun eliminarUsuarioActual(idUsuario: String) {
         _isLoading.value = true
         try {
@@ -129,25 +141,26 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
             if (response != null && response.isSuccessful) {
                 _usuarioActual.postValue(null)
             } else {
-                _error.postValue("Error al eliminar el usuario")
+                _error.postValue("Error, al eliminar el usuario")
             }
         } catch (e: Exception) {
-            _error.postValue("Error al eliminar el usuario: ${e.message}")
+            _error.postValue("Error, al eliminar el usuario: ${e.message}")
         } finally {
             _isLoading.value = false
         }
     }
-
+    // Método que envia una notificación push al iniciar sesión al usuario
+    // con un mensaje indicando que se ha iniciado la sesión en WalletApp
     fun enviarNotificacionAlServidor() {
-        // Obtener el token del dispositivo actual
+        // Obtiene el token del dispositivo actual
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
 
-                // Crear el cuerpo de la notificación
+                // Crea el cuerpo de la notificación
                 val notification = JSONObject().apply {
                     put("to", token)
-                    put("data", JSONObject().put("message", "Se ha iniciado la sesión"))
+                    put("data", JSONObject().put("message", "Se ha iniciado la sesión en WalletApp"))
                 }
 
                 // Configurar la conexión HTTP
@@ -162,8 +175,7 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                         os.write(notification.toString().toByteArray())
                         os.flush()
                     }
-
-                    // Lee la respuesta del servidor (es opcional)
+                    // Lee la respuesta del servidor
                     inputStream?.use { response ->
                         // Lee la respuesta del servidor
                         val responseData = response.bufferedReader().use { it.readText() }
@@ -171,9 +183,9 @@ class UsuarioViewModel(private val context: Context, private val tarjetasReposit
                     }
 
                     disconnect()
-                } ?: Log.e("UsuarioFragment", "No se pudo abrir la conexión HTTP")
+                } ?: Log.e("UsuarioFragment", "Error, no se pudo abrir la conexión HTTP")
             } else {
-                Log.e("UsuarioFragment", "Error al obtener el token de FCM: ${task.exception}")
+                Log.e("UsuarioFragment", "Error, al obtener el token de FCM: ${task.exception}")
             }
         }
     }

@@ -57,7 +57,6 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         _firmaSeleccionadaUrl.value = selectedImageUri
     }
 
-
     private val usuarioId: String = ""
 
     // LiveData para almacenar la lista de tarjetas DNI

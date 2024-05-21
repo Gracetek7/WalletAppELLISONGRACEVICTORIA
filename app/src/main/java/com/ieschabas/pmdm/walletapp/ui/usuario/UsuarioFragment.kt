@@ -49,10 +49,11 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         val viewModelFactory = UsuarioViewModelFactory(requireContext(), tarjetasRepository)
         usuarioViewModel = ViewModelProvider(this, viewModelFactory)[UsuarioViewModel::class.java]
 
-
         val tarjetaDNIViewModelFactory = TarjetaDNIViewModelFactory(requireContext(), tarjetasRepository)
         tarjetaDNIViewModel = ViewModelProvider(this, tarjetaDNIViewModelFactory)[TarjetaDNIViewModel::class.java]
 
+
+        // FragmentDNI listener para poder seleccionar la Foto o la Firma de la galería
         val tarjetaDNIFragmentListener = object : TarjetaDNIFragmentListener {
             override fun seleccionarFoto() {
                 seleccionarImagen(true)
@@ -93,8 +94,11 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         usuarioViewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
         }
+        // Carga al usuario actual
         cargarUsuarioActual()
 
+        // Boton click listener para escuchar el click producido del usuario,
+        // llamando al metodo de mostrar dialogo de crear Tarjetas
         btnAgregarTarjeta.setOnClickListener {
             Log.d("UsuarioFragment", "Botón Agregar Tarjeta clickeado")
             val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
@@ -119,6 +123,7 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         // Imprimir la tarjeta en formato pdf
     }
 
+    // Carga al usuario actual con sus tarjetas
     private fun cargarUsuarioActual() {
         val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
         usuarioId?.let { id ->
@@ -126,6 +131,7 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         }
     }
 
+    // Método para seleccionar la imágen
     private fun seleccionarImagen(isSelectingPhoto: Boolean) {
         this.isSelectingPhoto = isSelectingPhoto
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -134,12 +140,12 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
         imagePickerLauncher.launch(intent)
     }
 
+    // image picker launcher para seleccionar la imágen de la galería
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             val selectedImageUri: Uri? = data?.data
             selectedImageUri?.let {
-                // Pasa la URI seleccionada al ViewModel correspondiente
                 if (isSelectingPhoto) {
                     tarjetaDNIViewModel.handleSeleccionFoto(selectedImageUri)
                 } else {
@@ -148,7 +154,6 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
             }
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

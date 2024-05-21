@@ -93,8 +93,6 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
         }
     }
 
-
-
     // Dialógo para crear nueva Tarjeta SIP
     fun mostrarDialogoCrearTarjetaSIP(usuario: String, tarjetaSIP: Tarjeta.TarjetaSIP? = null) {
         Log.d("UsuarioViewModel", "en el metodo de mostrar Dialogo crear tarjeta SIP")
@@ -181,7 +179,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
                     }
                 } else {
                     // Muestra error si las fechas ingresadas no son válidas
-                    _error.postValue("Por favor, ingrese fechas válidas en formato dd/MM/yyyy.")
+                    _error.postValue("Por favor, introduce fechas válidas en formato dd/MM/yyyy.")
                 }
                 dialog.dismiss()
             }
