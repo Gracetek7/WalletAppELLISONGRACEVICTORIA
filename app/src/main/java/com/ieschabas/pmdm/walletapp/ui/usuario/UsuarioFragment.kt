@@ -35,6 +35,7 @@ class UsuarioFragment(private var tarjetasRepository: TarjetasRepository) : Frag
     private lateinit var navController: NavController
 
     private var _binding: FragmentUsuarioBinding? = null
+
     private val binding get() = _binding!!
 
     private var isSelectingPhoto: Boolean = false
