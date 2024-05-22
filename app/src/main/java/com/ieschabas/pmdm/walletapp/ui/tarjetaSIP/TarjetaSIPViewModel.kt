@@ -24,7 +24,6 @@ import java.util.Locale
 class TarjetaSIPViewModel (private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModel() {
 
     // MutableLiveData para almacenar la tarjeta SIP del usuario
-    // el valor de los datos almacenados dentro de este puede ser modificado
     private val _tarjetasSIP = MutableLiveData<Tarjeta.TarjetaSIP?>()
     val tarjetasSIP: MutableLiveData<Tarjeta.TarjetaSIP?> get() = _tarjetasSIP
 
@@ -179,7 +178,7 @@ class TarjetaSIPViewModel (private val context: Context, private val tarjetasRep
                     }
                 } else {
                     // Muestra error si las fechas ingresadas no son válidas
-                    _error.postValue("Por favor, introduce fechas válidas en formato dd/MM/yyyy.")
+                    _error.postValue("Error. Por favor, introduce fechas válidas en formato dd/MM/yyyy.")
                 }
                 dialog.dismiss()
             }

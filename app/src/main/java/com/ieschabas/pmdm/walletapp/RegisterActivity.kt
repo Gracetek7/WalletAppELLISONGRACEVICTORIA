@@ -77,7 +77,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
     }
-
+    // Sincroniza el usuario/a registrado usando Firebase con la base de datos de MySQL
     private suspend fun syncUserData(userData: Map<String, String>) {
         try {
             val response = tarjetasRepository.syncUserData(userData)

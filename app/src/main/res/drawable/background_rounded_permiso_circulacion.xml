@@ -3,6 +3,6 @@
 
     <solid android:color="#D5D1CB" />
 
-    <corners android:radius="20dp" /> <!-- Radio de las esquinas -->
+    <corners android:radius="20dp" /> 
 
 </shape>

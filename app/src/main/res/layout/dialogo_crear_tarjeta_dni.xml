@@ -159,30 +159,4 @@
         android:layout_marginBottom="40dp"
         android:src="@drawable/ic_signature" />
 
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal">-->
-
-<!--        <Button-->
-<!--            android:id="@+id/buttonCancelar"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:text="@string/cancelar_crear_tarjeta_dni"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:background="@color/colorAccent"-->
-<!--            android:layout_marginEnd="4dp"/>-->
-
-<!--        <Button-->
-<!--            android:id="@+id/buttonCrear"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_weight="1"-->
-<!--            android:text="@string/aceptar_crear_tarjeta_dni"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:background="@color/colorAccent"-->
-<!--            android:layout_marginStart="4dp"/>-->
-<!--    </LinearLayout>-->
-
 </LinearLayout>

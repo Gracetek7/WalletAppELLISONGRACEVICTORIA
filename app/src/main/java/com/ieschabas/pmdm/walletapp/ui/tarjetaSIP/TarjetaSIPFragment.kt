@@ -63,12 +63,12 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
 
             tarjetaSIP?.let { cargarTarjetaSIPUsuario(it) }
 
-            // Configurar clic en la tarjeta para modificar
+            // Configura el clic en la tarjeta para modificar
             binding.root.setOnClickListener {
                 mostrarDialogoModificar(tarjetaSIP!!)
             }
 
-            // Configurar clic largo en la tarjeta para eliminar
+            // Configura el clic largo en la tarjeta para eliminar
             binding.root.setOnLongClickListener {
                 mostrarDialogoEliminar(tarjetaSIP!!)
                 true
@@ -96,7 +96,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
             try {
                 // Obtiene la tarjeta SIP del repositorio
                 val tarjetasSIP = repository.obtenerTarjetaSIPUsuario(it)
-                // Si se obtiene al menos una tarjeta SIP, tomar la primera
                 if (tarjetasSIP.isNotEmpty() && tarjetasSIP[0].numeroSip.isNotEmpty()) {
                     return tarjetasSIP[0]
                 } else {
@@ -355,7 +354,6 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         }
         datePickerDialog!!.show()
 
-        // Add error handling to log an error message if fechaEmisionSeleccionada is null
         if (fechaEmisionSeleccionada == null) {
             Log.e("Error", "fechaEmisionSeleccionada is null")
         }
@@ -367,7 +365,7 @@ class TarjetaSIPFragment(private val repository: TarjetasRepository) : Fragment(
         builder.setTitle("Eliminar Tarjeta")
         builder.setMessage("¿Estás seguro de que deseas eliminar la Tarjeta SIP?")
         builder.setPositiveButton("Sí") { dialog, _ ->
-            // Lógica para eliminar la tarjeta
+            // Si el usuario pulsa la opcion de sí, se elimina la tarjeta
             eliminarTarjeta(tarjetaSIP)
             dialog.dismiss()
         }

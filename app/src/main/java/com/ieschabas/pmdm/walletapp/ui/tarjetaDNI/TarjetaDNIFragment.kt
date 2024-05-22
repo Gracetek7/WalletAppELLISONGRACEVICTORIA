@@ -131,16 +131,11 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         val imageBase64: String = Base64.encodeToString(imageBytes, Base64.DEFAULT)
 
         // Guardar la cadena Base64 en la base de datos
-        // Aquí necesitarás llamar a tu método para guardar en la base de datos MySQL
         guardarImagenEnBaseDeDatosMySQL(imageBase64)
     }
 
     // Función para guardar la imagen en la base de datos MySQL
     private fun guardarImagenEnBaseDeDatosMySQL(imageBase64: String) {
-        // Aquí deberías llamar a tu función para guardar en la base de datos MySQL
-        // Puedes usar Retrofit, Room, o cualquier otra forma de interactuar con tu base de datos
-        // Por ejemplo, si estás utilizando Retrofit, enviarías la cadena Base64 a través de una solicitud POST
-        // a tu API que luego la insertaría en la base de datos
     }
 
 
@@ -181,11 +176,11 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                 Manifest.permission.READ_MEDIA_IMAGES
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // Permiso concedido, proceder con la selección de imagen
+            // Permiso aceptado, proceder con la selección de imagen
             lanzarActividadSeleccionImagen()
         } else {
-            // Permiso no concedido, solicitar permiso
-            Log.d("TarjetaDNIFragment", "Permiso de almacenamiento externo no concedido. Solicitando permiso...")
+            // Permiso no aceptado, solicitar permiso
+            Log.d("TarjetaDNIFragment", "Permiso de almacenamiento externo no aceptado.")
             requestExternalStoragePermission()
         }
     }
@@ -195,7 +190,7 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
         }
-        Log.d("TarjetaDNIFragment", "Lanzando actividad de selección de imagen...")
+        Log.d("TarjetaDNIFragment", "Lanzando la actividad de selección de imagen")
         imagePickerLauncher.launch(intent)
     }
 
@@ -235,11 +230,9 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
             try {
                 // Obtener la tarjeta DNI del repositorio
                 val tarjetasDNI = repository.obtenerTarjetaDNIUsuario(it)
-                // Si se obtiene al menos una tarjeta DNI, tomar la primera (asumiendo que solo hay una por usuario)
                 if (tarjetasDNI.isNotEmpty() && tarjetasDNI[0].numeroDocumento.isNotEmpty()) {
                     return tarjetasDNI[0]
                 } else {
-                    // Si no se encuentra ninguna tarjeta DNI válida, devolver una tarjeta DNI vacía o lanzar una excepción según tu lógica
                     return null
                 }
             } catch (e: Exception) {
@@ -302,7 +295,7 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                             //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
                             .into(_binding?.ivFotografia)
                     } else {
-                        // Manejar el caso en el que la URL de la imagen esté vacía
+                        Log.d("TarjetaDNIFragment", "Error, la imagen es nula o no existe")
                     }
 
                     if (tarjetaDNI.firmaUrl.isNotEmpty()) {
@@ -312,7 +305,7 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
                             //.error(R.drawable.error_image) // Recurso de imagen de error si no se puede cargar la imagen
                             .into(_binding?.ivFirma)
                     } else {
-                        // Manejar el caso en el que la URL de la firma esté vacía
+                        Log.d("TarjetaDNIFragment", "Error, la imagen es nula o no existe")
                     }
                 }
             }
@@ -320,16 +313,12 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
     }
 
     private fun formatDate(date: Date): String {
-        // Define the desired format for the date
         val targetFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        // Format the date in the desired format
         return targetFormat.format(date)
     }
 
     private fun parseDate(dateString: String): Date? {
-        // Define the format of the date string
         val sourceFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        // Parse the date string into a Date object
         return sourceFormat.parse(dateString)
     }
 

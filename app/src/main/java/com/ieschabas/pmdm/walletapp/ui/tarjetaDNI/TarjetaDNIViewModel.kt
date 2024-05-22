@@ -116,9 +116,7 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
         viewModelScope.launch {
             val response = tarjetaDNI.id?.let { tarjetasRepository.modificarTarjetaDNI(it) }
             if (response?.isSuccessful == true) {
-                // Tarjeta modificada exitosamente
-                // Actualizar la lista de tarjetas en el ViewModel
-                //val tarjetasDNI = tarjetasRepository.obtenerTarjetaDNIUsuario(idUsuario)
+                // Tarjeta modificada exitosamente, actualizar la lista de tarjetas en el ViewModel
                 _tarjetasDNI.value = listOf(tarjetaDNI)
             } else {
                 Log.e("TarjetaDNIViewModel", "error al modificar la tarjeta dni")
@@ -194,8 +192,8 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
                 val fechaExpedicion: Date? = formatoInput.parse(fechaExpedicionStr)
                 val fechaCaducidad: Date? = formatoInput.parse(fechaCaducidadStr)
 
-                val fotografiaUrl = fotoSeleccionadaUrl.value // Obtener la URI de la foto seleccionada
-                val firmaUrl = firmaSeleccionadaUrl.value // Obtener la URI de la firma seleccionada
+                val fotografiaUrl = fotoSeleccionadaUrl.value // Obtiene la URI de la foto seleccionada
+                val firmaUrl = firmaSeleccionadaUrl.value // Obtiene la URI de la firma seleccionada
 
                 if (fotografiaUrl != null && firmaUrl != null) {
                     // Si se han seleccionado tanto la foto como la firma
