@@ -38,16 +38,20 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
     private var fragmentListener: TarjetaDNIFragmentListener? = null
     // Método para establecer el listener del fragmento
     fun setFragmentListener(listener: TarjetaDNIFragmentListener) {
+        Log.d("TarjetaDNIViewModel", "llamando a setFragmentListener")
         fragmentListener = listener
     }
 
     // Método en el ViewModel que llama al método seleccionarFoto() del fragmento
     fun llamarSeleccionarFoto() {
+        Log.d("TarjetaDNIViewModel", "llamarSeleccionarFoto llamado")
         fragmentListener?.seleccionarFoto()
     }
+
     // Método en el ViewModel que llama al método seleccionarFirma() del fragmento
     fun llamarSeleccionarFirma() {
-        fragmentListener?.seleccionarFirma()
+        Log.d("TarjetaDNIViewModel", "llamarSeleccionarFirma llamado")
+        fragmentListener?.seleccionarFirma() ?: Log.e("TarjetaDNIViewModel","listener nulo")
     }
     fun handleSeleccionFoto(selectedImageUri: Uri) {
         _fotoSeleccionadaUrl.value = selectedImageUri
@@ -70,7 +74,6 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
     // LiveData para almacenar la URI de la firma seleccionada
     private val _firmaSeleccionadaUrl = MutableLiveData<Uri?>()
     val firmaSeleccionadaUrl: LiveData<Uri?> get() = _firmaSeleccionadaUrl
-
 
     // LiveData para manejar el estado de carga
     private val _isLoading = MutableLiveData<Boolean>()
@@ -235,12 +238,16 @@ class TarjetaDNIViewModel(private val context: Context, private val tarjetasRepo
 
         // Botón para seleccionar la foto
         buttonFotografiaUrl.setOnClickListener {
+            Log.d("DialogoCrearTarjetaDNI", "Botón seleccionar foto clickeado")
+
             // Llamar al método para seleccionar la foto
             llamarSeleccionarFoto()
         }
 
         // Botón para seleccionar la firma
         buttonTextFirmaUrl.setOnClickListener {
+            Log.d("DialogoCrearTarjetaDNI", "Botón seleccionar firma clickeado")
+
             // Llamar al método para seleccionar la firma
             llamarSeleccionarFirma()
         }

@@ -34,10 +34,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-//interface ImageSelectionListener {
-//    fun selectImage(isSelectingPhoto: Boolean)
-//}
-
 class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment() {
 
     constructor() : this(TarjetasRepository(TarjetasApi()))
@@ -53,14 +49,14 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
     private var dialog: AlertDialog? = null
 
     private inner class FragmentListener : TarjetaDNIFragmentListener {
-        // Método para seleccionar una foto
+        // Método para seleccionar foto
         override fun seleccionarFoto() {
-            // Llamar al método para seleccionar una foto en el Fragment
+            // Llamar al método para seleccionar foto en el Fragment
             seleccionarImagen(true)
         }
-        // Método para seleccionar una firma
+        // Método para seleccionar firma
         override fun seleccionarFirma() {
-            // Llamar al método para seleccionar una firma en el Fragment
+            // Llamar al método para seleccionar firma en el Fragment
             seleccionarImagen(false)
         }
     }
@@ -138,12 +134,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
     private fun guardarImagenEnBaseDeDatosMySQL(imageBase64: String) {
     }
 
-
-    companion object {
-        private const val READ_EXTERNAL_STORAGE = 123
-        private const val SELECT_IMAGE_REQUEST_CODE = 456
-    }
-
     private var isSelectingPhoto: Boolean = true
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -170,13 +160,13 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
         val imageType = if (isSelectingPhoto) "foto" else "firma"
         Log.d("TarjetaDNIFragment", "Iniciando selección de $imageType")
 
-        // Verificar si el permiso para leer el almacenamiento externo ha sido concedido
+        // Verifica si el permiso para leer el almacenamiento externo ha sido concedido
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.READ_MEDIA_IMAGES
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // Permiso aceptado, proceder con la selección de imagen
+            // Permiso aceptado
             lanzarActividadSeleccionImagen()
         } else {
             // Permiso no aceptado, solicitar permiso
@@ -311,7 +301,6 @@ class TarjetaDNIFragment(private val repository: TarjetasRepository) : Fragment(
             }
         }
     }
-
     private fun formatDate(date: Date): String {
         val targetFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return targetFormat.format(date)

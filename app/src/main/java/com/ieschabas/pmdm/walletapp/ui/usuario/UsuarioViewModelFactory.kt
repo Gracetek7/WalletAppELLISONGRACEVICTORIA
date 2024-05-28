@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.ieschabas.pmdm.walletapp.data.TarjetasRepository
 import com.ieschabas.pmdm.walletapp.ui.tarjetaDNI.TarjetaDNIViewModel
 import com.ieschabas.pmdm.walletapp.ui.tarjetaSIP.TarjetaSIPViewModel
-
-
 class UsuarioViewModelFactory(private val context: Context, private val tarjetasRepository: TarjetasRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UsuarioViewModel::class.java)) {
